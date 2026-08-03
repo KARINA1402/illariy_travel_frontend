@@ -40,11 +40,11 @@ export class ClientesRegisterComponent implements OnInit {
   mostrarInputOtros = false;
 
   // Variables para la consulta RENIEC
-  buscandoDNI    = false;
-  dniBuscado     = false;
+  buscandoDNI = false;
+  dniBuscado = false;
   dniEncontrado: boolean | null = null;
 
-  private readonly TOKEN   = 'vp_live_aada01fa0e4c4fa290b3e042fc612bb8';
+  // private readonly TOKEN = 'vp_live_aada01fa0e4c4fa290b3e042fc612bb8';
   private readonly API_DNI = '/api/verificape/v2/dni';
   private debounceTimer: any = null;
 
@@ -91,7 +91,7 @@ export class ClientesRegisterComponent implements OnInit {
   onDNIInput(event: Event): void {
     const valor = (event.target as HTMLInputElement).value.trim();
 
-    this.dniBuscado    = false;
+    this.dniBuscado = false;
     this.dniEncontrado = null;
 
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
@@ -105,11 +105,7 @@ export class ClientesRegisterComponent implements OnInit {
   buscarDNI(dni: string): void {
     this.buscandoDNI = true;
 
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${this.TOKEN}`
-    });
-
-    this.http.get<VerificaPeRespuesta>(`${this.API_DNI}/${dni}`, { headers }).subscribe({
+    this.http.get<VerificaPeRespuesta>(`${this.API_DNI}/${dni}`).subscribe({
       next: (resp) => {
         this.buscandoDNI = false;
         if (!resp.success || !resp.data) {
@@ -117,7 +113,7 @@ export class ClientesRegisterComponent implements OnInit {
           this.dniEncontrado = false;
           return;
         }
-        this.dniBuscado    = true;
+        this.dniBuscado = true;
         this.dniEncontrado = true;
 
         // Formatear nombres con mayúscula inicial
@@ -126,11 +122,11 @@ export class ClientesRegisterComponent implements OnInit {
           : '';
 
         this.myForm.patchValue({
-          nombre:           cap(resp.data.names),
-          apellido:         [resp.data.paternalSurname, resp.data.maternalSurname]
-                              .filter(Boolean).map(cap).join(' '),
-          fecha_Nacimiento: this.formatDate(resp.data.birthDate),  // usa el método existente
-          nacionalidad:     'Peruana'
+          nombre: cap(resp.data.names),
+          apellido: [resp.data.paternalSurname, resp.data.maternalSurname]
+            .filter(Boolean).map(cap).join(' '),
+          fecha_Nacimiento: this.formatDate(resp.data.birthDate),
+          nacionalidad: 'Peruana'
         });
 
         // Marcar los campos como tocados para que se muestren los iconos y validaciones
@@ -139,8 +135,8 @@ export class ClientesRegisterComponent implements OnInit {
         );
       },
       error: () => {
-        this.buscandoDNI   = false;
-        this.dniBuscado    = true;
+        this.buscandoDNI = false;
+        this.dniBuscado = true;
         this.dniEncontrado = false;
       }
     });
