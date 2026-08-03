@@ -134,10 +134,13 @@ export class ClientesRegisterComponent implements OnInit {
           this.myForm.get(c)?.markAsTouched()
         );
       },
-      error: () => {
+      error: (err) => {
         this.buscandoDNI = false;
         this.dniBuscado = true;
         this.dniEncontrado = false;
+
+        console.error('🔥 ERROR REAL DE LA API:', err);
+        console.log('URL que se está llamando:', `${this.API_DNI}/${dni}`);
       }
     });
   }
