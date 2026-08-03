@@ -1,11 +1,28 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ClienteModel } from 'src/app/models/clientes.model';
 import { ClientesService } from 'src/app/service/clientes.service';
 import Swal from 'sweetalert2';
 import { DatePipe } from '@angular/common';
 import { UsuarioModel } from 'src/app/models/usuario.model';
 import { SesionService } from 'src/app/service/sesion.service';
+
+interface VerificaPeRespuesta {
+  success: boolean;
+  data: {
+    dni: string;
+    fullName: string;
+    names: string;
+    paternalSurname: string;
+    maternalSurname: string;
+    birthDate: string;
+    gender: string;
+    updatedAt: string;
+    source: string;
+  };
+  creditsRemaining: number;
+}
 
 @Component({
   selector: 'app-clientes-register',
@@ -22,11 +39,21 @@ export class ClientesRegisterComponent implements OnInit {
   usuario: UsuarioModel[] = [];
   mostrarInputOtros = false;
 
+  // Variables para la consulta RENIEC
+  buscandoDNI    = false;
+  dniBuscado     = false;
+  dniEncontrado: boolean | null = null;
+
+  private readonly TOKEN   = 'vp_live_aada01fa0e4c4fa290b3e042fc612bb8';
+  private readonly API_DNI = '/api/verificape/v2/dni';
+  private debounceTimer: any = null;
+
   readonly EDAD_MINIMA = 3;
   readonly EDAD_MAXIMA = 120;
 
   constructor(
     private fb: FormBuilder,
+    private http: HttpClient,
     private _clientesService: ClientesService,
     private _sesionService: SesionService
   ) {
@@ -47,7 +74,6 @@ export class ClientesRegisterComponent implements OnInit {
 
     this.myForm.get('nacionalidad')?.valueChanges.subscribe((valor: string) => {
       const controlOtros = this.myForm.get('nacionalidadOtros');
-      
       if (valor === 'Otros') {
         this.mostrarInputOtros = true;
         controlOtros?.setValidators([Validators.required]);
@@ -61,6 +87,66 @@ export class ClientesRegisterComponent implements OnInit {
 
   get f() { return this.myForm.controls; }
 
+  // ─── MÉTODOS PARA CONSULTA RENIEC ──────────────────────────────
+  onDNIInput(event: Event): void {
+    const valor = (event.target as HTMLInputElement).value.trim();
+
+    this.dniBuscado    = false;
+    this.dniEncontrado = null;
+
+    if (this.debounceTimer) clearTimeout(this.debounceTimer);
+
+    // Solo consulta si son exactamente 8 dígitos
+    if (!/^[0-9]{8}$/.test(valor)) return;
+
+    this.debounceTimer = setTimeout(() => this.buscarDNI(valor), 500);
+  }
+
+  buscarDNI(dni: string): void {
+    this.buscandoDNI = true;
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${this.TOKEN}`
+    });
+
+    this.http.get<VerificaPeRespuesta>(`${this.API_DNI}/${dni}`, { headers }).subscribe({
+      next: (resp) => {
+        this.buscandoDNI = false;
+        if (!resp.success || !resp.data) {
+          this.dniBuscado = true;
+          this.dniEncontrado = false;
+          return;
+        }
+        this.dniBuscado    = true;
+        this.dniEncontrado = true;
+
+        // Formatear nombres con mayúscula inicial
+        const cap = (s: string) => s
+          ? s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
+          : '';
+
+        this.myForm.patchValue({
+          nombre:           cap(resp.data.names),
+          apellido:         [resp.data.paternalSurname, resp.data.maternalSurname]
+                              .filter(Boolean).map(cap).join(' '),
+          fecha_Nacimiento: this.formatDate(resp.data.birthDate),  // usa el método existente
+          nacionalidad:     'Peruana'
+        });
+
+        // Marcar los campos como tocados para que se muestren los iconos y validaciones
+        ['nombre', 'apellido', 'fecha_Nacimiento'].forEach(c =>
+          this.myForm.get(c)?.markAsTouched()
+        );
+      },
+      error: () => {
+        this.buscandoDNI   = false;
+        this.dniBuscado    = true;
+        this.dniEncontrado = false;
+      }
+    });
+  }
+
+  // ─── VALIDADORES ─────────────────────────────────────────────────
   validarRangoEdad() {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value) {
@@ -76,7 +162,6 @@ export class ClientesRegisterComponent implements OnInit {
 
       let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
       const mes = hoy.getMonth() - fechaNacimiento.getMonth();
-      
       if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
         edad--;
       }
@@ -105,6 +190,7 @@ export class ClientesRegisterComponent implements OnInit {
     return hace120Anos.toISOString().split('T')[0];
   }
 
+  // ─── CICLO DE VIDA ───────────────────────────────────────────────
   ngOnInit(): void {
     const nacionalidadActual = this.clientes.nacionalidad;
     if (nacionalidadActual && !['Peruana', 'Venezolana', 'Boliviana', 'Chilena'].includes(nacionalidadActual)) {
@@ -128,21 +214,29 @@ export class ClientesRegisterComponent implements OnInit {
     });
   }
 
+  // ─── UTILIDADES DE FECHA ─────────────────────────────────────────
+  /** "DD/MM/YYYY" → "YYYY-MM-DD" (para el input date) */
   formatDate(dateString: string): string {
-    if (!dateString) {
-      return '';
-    }
+    if (!dateString) return '';
     const dateParts = dateString.split('/');
-    const year = dateParts[2];
-    const month = dateParts[1];
-    const day = dateParts[0];
+    if (dateParts.length !== 3) return '';
+    const [day, month, year] = dateParts;
     return `${year}-${month}-${day}`;
   }
 
+  /** "YYYY-MM-DD" → "DD/MM/YYYY" (para el servidor) */
+  formatDateForServer(dateString: string): string {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  }
+
+  // ─── MODAL ───────────────────────────────────────────────────────
   closeModal(res: boolean) {
     this.closeModalEmmit.emit(res);
   }
 
+  // ─── GUARDAR ─────────────────────────────────────────────────────
   save() {
     if (this.myForm.invalid) {
       Swal.fire({
@@ -171,15 +265,14 @@ export class ClientesRegisterComponent implements OnInit {
 
   createClientes() {
     let cliente: any = this.myForm.value;
-    
-    // Si seleccionó "Otros", usar el valor del input
+
     if (this.myForm.get('nacionalidad')?.value === 'Otros') {
       cliente.nacionalidad = this.myForm.get('nacionalidadOtros')?.value;
     }
 
     cliente.fecha_Nacimiento = this.formatDateForServer(cliente.fecha_Nacimiento);
     const authenticatedUser = this._sesionService.getUser();
-    
+
     if (authenticatedUser) {
       cliente.iD_Usuario = authenticatedUser.iD_Usuario;
     } else {
@@ -220,8 +313,7 @@ export class ClientesRegisterComponent implements OnInit {
 
   updateClientes() {
     let cliente: any = this.myForm.value;
-    
-    // Si seleccionó "Otros", usar el valor del input
+
     if (this.myForm.get('nacionalidad')?.value === 'Otros') {
       cliente.nacionalidad = this.myForm.get('nacionalidadOtros')?.value;
     }
@@ -251,16 +343,5 @@ export class ClientesRegisterComponent implements OnInit {
         this.closeModalEmmit.emit(false);
       }
     );
-  }
-
-  formatDateForServer(dateString: string): string {
-    if (!dateString) {
-      return '';
-    }
-    const dateParts = dateString.split('-');
-    const day = dateParts[2];
-    const month = dateParts[1];
-    const year = dateParts[0];
-    return `${day}/${month}/${year}`;
   }
 }

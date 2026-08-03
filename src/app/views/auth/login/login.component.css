@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Nerko+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Montserrat:wght@400;500;600;700;800&display=swap');
 
 /* Contenedor Principal: Full Screen y Alineado a la izquierda */
 .login-wrapper {
@@ -10,7 +10,7 @@
   display: flex;
   align-items: center; 
   justify-content: flex-start;
-  padding-left: clamp(2rem, 8vw, 10rem); /* Espaciado dinámico */
+  padding-left: clamp(2rem, 8vw, 10rem);
   margin: 0;
   overflow: hidden;
 }
@@ -23,28 +23,34 @@
   animation: slideUp 0.8s ease-out;
 }
 
-/* Título IGUAZU: Posicionado arriba con buen margen */
+/* Logo y título Illariy */
 .logo-container {
-  margin-bottom: 40px; /* Espacio generoso para que no choque con el div */
+  margin-bottom: 40px;
   text-align: center;
 }
 
 .logo-font {
-  font-family: 'Nerko One', cursive;
-  font-size: 5rem;
-  color: #008037;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 2.5rem;
+  color: #DC2626;
   text-transform: uppercase;
-  text-shadow: 3px 3px 0px #000;
-  letter-spacing: 4px;
+  text-shadow: 2px 2px 0px #000;
+  letter-spacing: 2px;
 }
 
-/* Card de Login: Diseño Minimalista y Profundo */
+.logo-font span {
+  font-weight: 400;
+  color: white;
+}
+
+/* Card de Login: Rojo oscuro elegante */
 .login-card {
-  background: rgba(11, 53, 102, 0.88); /* Azul profundo elegante */
+  background: rgba(127, 29, 29, 0.92); /* Rojo oscuro #7F1D1D con opacidad */
   border-radius: 20px;
   padding: 45px 35px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
   backdrop-filter: blur(5px);
 }
 
@@ -77,11 +83,11 @@
 
 .form-control:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 128, 55, 0.4);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.4);
   transform: scale(1.02);
 }
 
-/* Botón: El toque final */
+/* Botón: Rojo Illariy */
 .action-area {
   display: flex;
   justify-content: center;
@@ -89,7 +95,7 @@
 }
 
 .btn-ingresar {
-  background: #008037;
+  background: #DC2626;
   color: white;
   border: none;
   padding: 12px 60px;
@@ -103,9 +109,9 @@
 }
 
 .btn-ingresar:hover {
-  background: #00a848;
+  background: #B91C1C;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 128, 55, 0.4);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
 /* Animación sutil de entrada */
@@ -121,6 +127,6 @@
     padding-left: 0;
   }
   .logo-font {
-    font-size: 3.5rem;
+    font-size: 3.2rem;
   }
 }

@@ -1,60 +1,190 @@
-.container-img {
-    display: flex;  /* Activa Flexbox, que por defecto es horizontal */
-    height: 500px;  /* Altura fija para todas las imágenes */
-    width: 100%;    /* Asume el ancho total de la pantalla */
-}
-  
-.container-img img {
-flex-grow: 1;   /* Permite que cada imagen crezca para llenar el espacio disponible */
-object-fit: cover; /* Asegura que las imágenes cubran completamente su espacio sin deformarse */
-width: 50%;   /* Ajusta automáticamente el ancho para mantener la relación de aspecto */
-}
-  
-.logo{
-  width: auto;
-  height: 100px;
+/* =====================================================
+   DASHBOARD REPORTES – FONDO BLANCO + COMPACTO
+   ===================================================== */
+
+/* Fondo blanco y limpieza de márgenes */
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #ffffff;
+  color: #1e293b;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  padding-bottom: 1rem;
 }
 
-/* Reloj */
+/* Reloj compacto con borde sutil */
 .clock-container {
-    position: fixed;
-    top: 6px;
-    right: 20px;
-    width: 240px;
-    height: 80px;
-    background: linear-gradient(to top, #212529, #021b79);
-    color: #fff;
-    font-size: 40px;
-    font-weight: bold;
-    font-family: 'Montserrat', sans-serif;
-    display: flex;
-    align-items: center; /* Asegura centrado vertical */
-    justify-content: center; /* Asegura centrado horizontal */
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px #ccc;
-    animation: clock-animation 1s ease-in-out infinite;
-    padding: 0; /* Asegura que no haya padding interfiriendo con la alineación */
-    margin: 0; /* Asegura que no haya márgenes interfiriendo */
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  background: #f8fafc;
+  backdrop-filter: none;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+  font-weight: 500;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.3px;
 }
 
-#clock {
-    font-size: 15px;
-    display: flex;
-    align-items: center; /* Asegura centrado vertical dentro del div #clock */
-    justify-content: center; /* Asegura centrado horizontal */
-    width: 100%; /* Asegura que ocupe todo el ancho del contenedor padre */
+/* Barra de filtro – más compacta, sin glass, borde suave */
+.filter-bar {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
+.date-input-group {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  border: 1px solid #cbd5e1;
+}
 
+.date-input-group i {
+  color: #475569;
+  margin-right: 6px;
+}
 
-/* @keyframes clock-animation {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1);
-    }
-} */
+.date-input-group input[type="date"] {
+  background: transparent;
+  border: none;
+  color: #0f172a;
+  font-size: 13px;
+  outline: none;
+}
+
+/* Botones planos y compactos */
+.btn-glass, .btn-glass-success {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+  backdrop-filter: none;
+  border-radius: 8px;
+  padding: 4px 14px;
+  font-size: 13px;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.btn-glass:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.btn-glass-success {
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.btn-glass-success:hover {
+  background: #ecfdf5;
+  border-color: #059669;
+}
+
+/* KPI Cards – compactas, fondo blanco, sombra ligera */
+.kpi-glass {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-glass:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-glass-icon {
+  font-size: 1.4rem;
+  margin-bottom: 2px;
+}
+
+/* Colores de íconos más vibrantes pero sobre fondo blanco */
+.kpi-blue .kpi-glass-icon { color: #2563eb; }
+.kpi-green .kpi-glass-icon { color: #059669; }
+.kpi-purple .kpi-glass-icon { color: #7c3aed; }
+.kpi-pink .kpi-glass-icon { color: #db2777; }
+
+.kpi-glass-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.kpi-glass-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* Tarjetas de gráficos – más compactas, fondo blanco */
+
+.chart-glass {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.chart-glass-header {
+  background: #fcfcfd;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #334155;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.chart-glass-body {
+  padding: 12px;
+  position: relative;
+  height: 220px;
+}
+
+.chart-glass-body canvas {
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.03));
+  border-radius: 12px;
+}
+
+.no-data {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .kpi-glass { padding: 10px 12px; }
+  .kpi-glass-value { font-size: 1.1rem; }
+  .chart-glass-body { height: 200px; }
+  .filter-bar { padding: 8px 12px; }
+}

@@ -5,166 +5,182 @@
   <div class="spinner-border text-primary" role="status">
     <span class="visually-hidden">Cargando...</span>
   </div>
-  <p class="mt-2 text-muted" style="font-family: sans-serif; font-size: 13px;">Cargando comprobante...</p>
+  <p class="mt-2 text-muted">Cargando comprobante...</p>
 </div>
 
 <!-- Alerta de Error -->
-<div *ngIf="!cargando && error" class="alert alert-danger m-3" style="font-family: sans-serif; font-size: 13px;">
+<div *ngIf="!cargando && error" class="alert alert-danger m-3">
   <i class="fas fa-exclamation-circle"></i>
   Ocurrió un error al cargar los datos del comprobante. Intente de nuevo.
 </div>
 
-<!-- Cuerpo del Comprobante -->
-<div *ngIf="!cargando && !error" style="display: flex; justify-content: center; padding: 20px; background-color: #f4f6f9;">
-  <div id="app2" style="width: 80mm; background-color: #ffffff; color: #222222; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; padding: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-radius: 4px; box-sizing: border-box;">
+<!-- Cuerpo del Comprobante (Boleta) -->
+<div *ngIf="!cargando && !error" class="comprobante-wrapper">
+  <div id="app2" class="boleta-container">
 
-    <!-- Encabezado de la Empresa -->
-    <div style="text-align: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #aaaaaa;">
-      <img src="./assets/imagenes/logo.png" alt="logo" width="65px" style="margin-bottom: 6px; filter: grayscale(20%);" />
-      <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: #111111;">TOUR EXPRESS IGUAZU E.I.R.L</p>
-      <p style="margin: 0 0 2px 0; font-size: 8.5px; color: #555555;">Agencia de Viajes y Turismo</p>
-      <p style="margin: 0 0 2px 0; font-size: 8.5px; color: #555555;">Huancayo, Perú</p>
-      <p style="margin: 0 0 2px 0; font-size: 8.5px; color: #555555;">Tel: 930 164 767</p>
-      <p style="margin: 0 0 8px 0; font-size: 9px; font-weight: bold; color: #444444;">RUC: 20605995480</p>
+    <!-- ========= ENCABEZADO EMPRESA ========= -->
+    <div class="encabezado">
+      <img src="./assets/imagenes/logo.png" alt="Illariy Travel" class="logo-boleta" />
+      <div class="nombre-empresa">ILLARIY TRAVEL</div>
+      <div class="subtitulo">Agencia de Viajes y Turismo</div>
+      <div class="direccion">Jr. Puno 293 - Huancayo, Perú</div>
+      <div class="contacto">
+        📞 990 693 358 / 966 862 395 &nbsp;|&nbsp;
+        ✉ reservas@illariytravel.com
+      </div>
+      <div class="ruc">RUC: 20605995480</div>
       
-      <div style="background-color: #f8f9fa; padding: 6px; border: 1px solid #e9ecef; border-radius: 4px; margin-top: 4px;">
-        <span style="display: block; font-size: 10px; font-weight: 800; color: #111111; letter-spacing: 0.5px;">BOLETA ELECTRÓNICA</span>
-        <span style="display: block; font-size: 9px; margin-top: 2px; color: #555555; font-family: monospace;">NRO OPERACIÓN: {{ nroOperacion }}</span>
+      <div class="boleta-tag">
+        <span>BOLETA ELECTRÓNICA</span>
+        <span class="nro-operacion">N° OPERACIÓN: {{ nroOperacion }}</span>
       </div>
     </div>
 
-    <!-- Información de la Reserva -->
-    <div style="margin-bottom: 12px; font-size: 10px; line-height: 1.4;">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-        <span style="color: #666666;">Cliente:</span>
-        <span style="font-weight: 700; text-align: right; max-width: 70%;">{{ cliente.nombre }} {{ cliente.apellido }}</span>
+    <!-- ========= INFO RESERVA ========= -->
+    <div class="info-reserva">
+      <div class="linea">
+        <span class="etiqueta">Cliente:</span>
+        <span class="valor">{{ cliente.nombre }} {{ cliente.apellido }}</span>
       </div>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-        <span style="color: #666666;">Teléfono:</span>
-        <span style="font-weight: 600;">{{ cliente.telefono }}</span>
+      <div class="linea">
+        <span class="etiqueta">Teléfono:</span>
+        <span class="valor">{{ cliente.telefono }}</span>
       </div>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-        <span style="color: #666666;">Fecha Reserva:</span>
-        <span>{{ reserva.fecha_Reserva }}</span>
+      <div class="linea">
+        <span class="etiqueta">Fecha Reserva:</span>
+        <span class="valor">{{ reserva.fecha_Reserva }}</span>
       </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span style="color: #666666;">Total Personas:</span>
-        <span style="font-weight: 700; background-color: #e9ecef; padding: 0 5px; border-radius: 3px; font-size: 9.5px;">{{ reserva.numero_Personas }}</span>
+      <div class="linea">
+        <span class="etiqueta">Total Personas:</span>
+        <span class="valor badge-personas">{{ reserva.numero_Personas }}</span>
       </div>
     </div>
 
-    <!-- Listado de Pasajeros -->
-    <div style="margin-bottom: 12px; padding-top: 8px; border-top: 1px dashed #aaaaaa;">
-      <p style="margin: 0 0 6px 0; text-align: center; font-size: 9.5px; font-weight: 800; color: #444444; letter-spacing: 0.3px;">PASAJEROS EN LA RESERVA</p>
+    <!-- ========= PASAJEROS ========= -->
+    <div class="seccion">
+      <div class="seccion-titulo">PASAJEROS EN LA RESERVA</div>
       
       <!-- Titular -->
-      <div style="background-color: #fafafa; border: 1px solid #e9ecef; border-radius: 4px; padding: 6px; margin-bottom: 5px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-          <span style="font-weight: 700; color: #222222; font-size: 9.5px;">1. {{ cliente.nombre }} {{ cliente.apellido }}</span>
-          <span style="font-size: 7.5px; font-weight: 700; color: #0066cc; background-color: #f0f7ff; border: 1px solid #bcd6f5; padding: 1px 4px; border-radius: 3px; letter-spacing: 0.2px;">TITULAR</span>
+      <div class="pasajero-card">
+        <div class="pasajero-header">
+          <span class="nombre">1. {{ cliente.nombre }} {{ cliente.apellido }}</span>
+          <span class="badge-titular">TITULAR</span>
         </div>
-        <div style="font-size: 8.5px; color: #666666; font-family: monospace;">
+        <div class="pasajero-doc">
           Doc: {{ cliente.pasaporte || '---' }} | Nac: {{ cliente.nacionalidad }}
         </div>
       </div>
 
       <!-- Acompañantes -->
-      <div *ngFor="let acompanante of acompanantes; let i = index" style="background-color: #fafafa; border: 1px solid #e9ecef; border-radius: 4px; padding: 6px; margin-bottom: 5px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-          <span style="font-weight: 700; color: #222222; font-size: 9.5px;">{{ i + 2 }}. {{ acompanante.nombre }} {{ acompanante.apellido }}</span>
-          <span style="font-size: 7.5px; font-weight: 700; color: #288a42; background-color: #f1faf4; border: 1px solid #c3ebd0; padding: 1px 4px; border-radius: 3px; letter-spacing: 0.2px;">ACOMP.</span>
+      <div *ngFor="let acompanante of acompanantes; let i = index" class="pasajero-card">
+        <div class="pasajero-header">
+          <span class="nombre">{{ i + 2 }}. {{ acompanante.nombre }} {{ acompanante.apellido }}</span>
+          <span class="badge-acomp">ACOMP.</span>
         </div>
-        <div style="font-size: 8.5px; color: #666666; font-family: monospace;">
+        <div class="pasajero-doc">
           Doc: {{ acompanante.pasaporte || '---' }} | Nac: {{ acompanante.nacionalidad }}
         </div>
       </div>
     </div>
 
-    <!-- Detalles del Paquete Turístico -->
-    <div *ngIf="paquete" style="margin-bottom: 12px; padding-top: 8px; border-top: 1px dashed #aaaaaa; line-height: 1.35;">
-      <p style="margin: 0 0 6px 0; text-align: center; font-size: 9.5px; font-weight: 800; color: #444444; letter-spacing: 0.3px;">DETALLES DEL PAQUETE</p>
-      
-      <div style="background-color: #fafafa; border: 1px solid #eeeeee; border-radius: 4px; padding: 6px; font-size: 9.5px;">
-        <div style="margin-bottom: 3px;"><strong style="color: #111111;">{{ paquete.nombre }}</strong></div>
-        <div style="margin-bottom: 2px;"><span style="color:#666;">Destino: </span> <span style="font-weight: 600;">{{ getDestinoNombre(paquete.iD_Destino) }}</span></div>
-        <div style="margin-bottom: 2px;"><span style="color:#666;">Inicio:</span> {{ paquete.fecha_Inicio }}</div>
-        <div style="margin-bottom: 2px;"><span style="color:#666;">Fin:</span> {{ paquete.fecha_Fin }}</div>
-        <div><span style="color:#666;">Precio Base: </span> <span style="font-weight: 600; font-family: monospace;">{{ paquete.precio_Base | number:'1.2-2' }} {{ getMonedaNombre(paquete.iD_Destino) }}</span></div>
+    <!-- ========= DETALLE PAQUETE ========= -->
+    <div *ngIf="paquete" class="seccion">
+      <div class="seccion-titulo">DETALLES DEL PAQUETE</div>
+      <div class="paquete-card">
+        <div class="paquete-nombre">{{ paquete.nombre }}</div>
+        <div class="paquete-linea">
+          <span class="etiqueta">Destino:</span>
+          <span class="valor">{{ getDestinoNombre(paquete.iD_Destino) }}</span>
+        </div>
+        <div class="paquete-linea">
+          <span class="etiqueta">Inicio:</span>
+          <span class="valor">{{ paquete.fecha_Inicio }}</span>
+        </div>
+        <div class="paquete-linea">
+          <span class="etiqueta">Fin:</span>
+          <span class="valor">{{ paquete.fecha_Fin }}</span>
+        </div>
+        <div class="paquete-linea">
+          <span class="etiqueta">Precio Base:</span>
+          <span class="valor-precio">{{ paquete.precio_Base | number:'1.2-2' }} {{ getMonedaNombre(paquete.iD_Destino) }}</span>
+        </div>
       </div>
     </div>
 
-    <!-- Glosa / Notas adicionales -->
-    <div style="margin-bottom: 12px; padding-top: 6px; font-size: 8.5px; color: #555555; line-height: 1.4; word-wrap: break-word;">
-      <p *ngIf="paquete?.descripcion" style="margin: 0 0 3px 0;"><strong>Descripción:</strong> {{ paquete?.descripcion }}</p>
-      <p *ngIf="paquete?.inclusiones" style="margin: 0 0 3px 0; color: #28a745;"><strong>Incluye:</strong> {{ paquete?.inclusiones }}</p>
-      <p *ngIf="paquete?.exclusiones" style="margin: 0 0 3px 0; color: #dc3545;"><strong>No Incluye:</strong> {{ paquete?.exclusiones }}</p>
-      <p *ngIf="reserva.observaciones" style="margin: 0;"><strong>Obs:</strong> {{ reserva.observaciones }}</p>
+    <!-- ========= GLOSA / NOTAS ========= -->
+    <div class="seccion notas">
+      <div *ngIf="paquete?.descripcion" class="nota">
+        <strong>Descripción:</strong> {{ paquete?.descripcion }}
+      </div>
+      <div *ngIf="paquete?.inclusiones" class="nota nota-incluye">
+        <strong>Incluye:</strong> {{ paquete?.inclusiones }}
+      </div>
+      <div *ngIf="paquete?.exclusiones" class="nota nota-excluye">
+        <strong>No Incluye:</strong> {{ paquete?.exclusiones }}
+      </div>
+      <div *ngIf="reserva.observaciones" class="nota">
+        <strong>Observaciones:</strong> {{ reserva.observaciones }}
+      </div>
     </div>
 
-    <!-- RESUMEN DE VENTAS Y FLUJO DE CAJA (CORREGIDO) -->
-    <div style="border: 1px solid #222222; padding: 8px; margin: 10px 0; background-color: #fafafa; border-radius: 4px; line-height: 1.4;">
-      <p style="margin: 0 0 6px 0; text-align: center; font-size: 9.5px; font-weight: 800; border-bottom: 1px solid #dddddd; padding-bottom: 4px; color: #111111; letter-spacing: 0.3px;">RESUMEN DE VENTA</p>
-      
-      <div style="display: flex; justify-content: space-between; font-size: 9.5px; margin-bottom: 3px;">
-        <span style="color: #555555;">Multi-Pasajero:</span>
-        <span style="font-family: monospace;">{{ reserva.numero_Personas }} × {{ paquete?.precio_Base | number:'1.2-2' }}</span>
+    <!-- ========= RESUMEN DE VENTA ========= -->
+    <div class="resumen-venta">
+      <div class="resumen-titulo">RESUMEN DE VENTA</div>
+      <div class="resumen-linea">
+        <span>Multi-Pasajero:</span>
+        <span>{{ reserva.numero_Personas }} × {{ paquete?.precio_Base | number:'1.2-2' }}</span>
       </div>
-
-      <div style="display: flex; justify-content: space-between; font-size: 11.5px; font-weight: 800; border-bottom: 1px dashed #cccccc; padding-bottom: 4px; margin-bottom: 6px; color: #111111;">
+      <div class="resumen-linea total-importe">
         <span>TOTAL IMPORTE:</span>
-        <span style="font-family: monospace;">{{ reserva.precio_Total | number:'1.2-2' }} {{ getMonedaNombre(paquete?.iD_Destino) }}</span>
+        <span>{{ reserva.precio_Total | number:'1.2-2' }} {{ getMonedaNombre(paquete?.iD_Destino) }}</span>
       </div>
-
-      <div style="display: flex; justify-content: space-between; font-size: 9.5px; margin-bottom: 2px;">
-        <span style="color: #555555;">Monto Pagado:</span>
-        <span style="font-family: monospace; font-weight: 600; color: #008037;">{{ pagarCon | number:'1.2-2' }} {{ getMonedaNombre(paquete?.iD_Destino) }}</span>
+      <div class="resumen-linea">
+        <span>Monto Pagado:</span>
+        <span class="monto-pagado">{{ pagarCon | number:'1.2-2' }} {{ getMonedaNombre(paquete?.iD_Destino) }}</span>
       </div>
-
-      <div style="display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; padding-top: 2px; border-top: 1px solid #dddddd;">
-        <span style="color: #555555;">Vuelto:</span>
-        <span style="font-family: monospace; color: #222222;">
-          {{ vuelto | number:'1.2-2' }} {{ getMonedaNombre(paquete?.iD_Destino) }}
-        </span>
+      <div class="resumen-linea vuelto">
+        <span>Vuelto:</span>
+        <span>{{ vuelto | number:'1.2-2' }} {{ getMonedaNombre(paquete?.iD_Destino) }}</span>
       </div>
     </div>
 
-    <!-- Pie de Impresión -->
-    <div style="text-align: center; margin-top: 12px; padding-top: 8px; border-top: 1px dashed #aaaaaa; font-size: 8.5px; color: #666666; line-height: 1.4;">
-      <p style="margin: 0 0 2px 0; font-weight: 700; color: #333333;">¡Gracias por su preferencia!</p>
-      <p style="margin: 0 0 4px 0;">Esta es una boleta electrónica válida como comprobante de pago.</p>
-      <p style="margin: 4px 0 0 0; font-size: 7.5px; color: #999999; font-family: monospace;">Emitida el: {{ reserva.fecha_Reserva }}</p>
+    <!-- ========= PIE DE PÁGINA ========= -->
+    <div class="pie-boleta">
+      <p>¡Gracias por su preferencia!</p>
+      <p>Esta es una boleta electrónica válida como comprobante de pago.</p>
+      <p class="fecha-emision">Emitida el: {{ reserva.fecha_Reserva }}</p>
     </div>
 
   </div>
 </div>
 
 <!-- Botón de impresión -->
-<div style="text-align: center; padding: 20px 0;">
-  <button (click)="PrintElem()" class="btn btn-success btn-lg" style="font-size: 14px; font-family: sans-serif; padding: 10px 24px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+<div class="print-button-container">
+  <button (click)="PrintElem()" class="btn-print">
     <i class="fas fa-print"></i> Imprimir Boleta
   </button>
 </div>
 
-<!-- Estilos exclusivos de impresión CSS nativo -->
+<!-- Estilos de impresión -->
 <style>
   @media print {
     body {
       margin: 0 !important;
       padding: 0 !important;
-      background-color: #ffffff !important;
+      background: white !important;
     }
-    
+    .print-button-container, .btn-print, .alert, .spinner-border {
+      display: none !important;
+    }
     #app2 {
       width: 80mm !important;
-      margin: 0 !important;
-      padding: 8px !important;
+      margin: 0 auto !important;
+      padding: 6px !important;
       box-shadow: none !important;
       border-radius: 0 !important;
-      page-break-after: avoid;
     }
-
-    .btn, button, footer {
-      display: none !important;
+    .boleta-container {
+      border: none !important;
     }
   }
 </style>

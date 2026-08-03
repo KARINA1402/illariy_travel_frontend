@@ -1,41 +1,203 @@
-/* Ajuste de tamaño de fuente para el marcador de posición de .pagar */
-.pagar::placeholder {
-    font-size: 12px;
+/* =====================================================
+   MODALES MEJORADOS - CLIENTES, PAQUETES, ACOMPAÑANTES
+   ===================================================== */
+
+/* Fondo del modal y bordes redondeados */
+.modal-content {
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
 
-/* Estilo común para th y td */
-th, td {
-    vertical-align: middle;
-    font-size: 12px;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+/* Cabecera del modal con gradiente moderno */
+.modal-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border-bottom: none;
+  padding: 1.2rem 1.5rem;
 }
 
-/* Tamaño de fuente para el icono dentro de los botones */
-button i {
-    font-size: 12px;
+.modal-header .modal-title {
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: 0.3px;
 }
 
-/* Eliminar el sombreado y ajustar el color del borde en el foco de los input */
-input.form-control:focus {
-    box-shadow: none;
-    border-color: #ced4da; /* Puedes ajustar el color del borde según tus necesidades */
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
+  transition: opacity 0.2s;
 }
 
-/* Selecciona los campos de entrada para cliente */
-#form_new_cliente_reserva input[type="text"],
-#form_new_cliente_reserva input[type="number"],
-#form_new_cliente_reserva input[type="button"],
-#form_new_cliente_reserva input[type="hidden"] {
-  font-size: 12px;
+.modal-header .btn-close:hover {
+  opacity: 1;
 }
 
-#detalle_reserva input[type="text"],
-#detalle_reserva textarea {
-  font-size: 12px;
+/* Cuerpo del modal con padding cómodo */
+.modal-body {
+  padding: 1.5rem;
+  background: #ffffff;
 }
 
-/* Adicionalmente, puedes ajustar el tamaño de fuente de otros inputs específicos si es necesario */
-.pagar {
-  font-size: 12px;
+/* Input de búsqueda con ícono moderno */
+.modal-body .input-group {
+  border-radius: 50px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
 }
 
+.modal-body .input-group-text {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-right: none;
+  border-radius: 50px 0 0 50px;
+  color: #64748b;
+}
+
+.modal-body .input-group .form-control {
+  border: 1px solid #e2e8f0;
+  border-left: none;
+  border-radius: 0 50px 50px 0;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+}
+
+.modal-body .input-group .form-control:focus {
+  border-color: #6366f1;
+  box-shadow: none;
+}
+
+/* Tablas dentro del modal */
+.modal-body .table-responsive {
+  border-radius: 16px;
+  border: 1px solid #eef2f6;
+  overflow: auto;
+}
+
+.modal-body .table {
+  margin-bottom: 0;
+  font-size: 0.8rem;
+}
+
+/* Cabecera de la tabla con color atractivo */
+.modal-body .table thead th {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 8px;
+  white-space: nowrap;
+}
+
+/* Filas de la tabla */
+.modal-body .table tbody td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f2f5;
+  color: #1e293b;
+}
+
+/* Efecto hover en filas */
+.modal-body .table tbody tr:hover {
+  background-color: #fefce8;
+  transition: background 0.2s;
+}
+
+/* Botón Seleccionar / Agregar dentro de la tabla */
+.modal-body .table .btn {
+  border-radius: 30px;
+  padding: 5px 14px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Botón primario (seleccionar cliente) */
+.modal-body .table .btn-primary {
+  background: linear-gradient(100deg, #3b82f6, #2563eb);
+  border: none;
+  color: white;
+}
+
+.modal-body .table .btn-primary:hover {
+  background: linear-gradient(100deg, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+}
+
+/* Botón éxito (agregar acompañante) */
+.modal-body .table .btn-success {
+  background: linear-gradient(100deg, #10b981, #059669);
+  border: none;
+  color: white;
+}
+
+.modal-body .table .btn-success:hover:not(:disabled) {
+  background: linear-gradient(100deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(5, 150, 105, 0.2);
+}
+
+.btn-success:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Paginación dentro del modal */
+.modal-body pagination-controls {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.modal-body .ngx-pagination {
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
+.modal-body .ngx-pagination .current {
+  background: #6366f1;
+  border-radius: 30px;
+  padding: 4px 12px;
+}
+
+.modal-body .ngx-pagination a, 
+.modal-body .ngx-pagination button {
+  border-radius: 30px;
+  color: #334155;
+}
+
+/* Mensaje cuando no hay datos */
+.modal-body .text-muted {
+  color: #94a3b8 !important;
+  font-style: italic;
+}
+
+/* Pequeño texto de faltantes en acompañantes */
+.modal-body small.text-muted {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 0.75rem;
+}
+
+/* Ajustes responsive para móviles */
+@media (max-width: 576px) {
+  .modal-body {
+    padding: 1rem;
+  }
+  .modal-body .table thead th,
+  .modal-body .table tbody td {
+    font-size: 0.7rem;
+    padding: 6px 4px;
+  }
+  .modal-body .table .btn {
+    padding: 3px 8px;
+    font-size: 0.65rem;
+  }
+}

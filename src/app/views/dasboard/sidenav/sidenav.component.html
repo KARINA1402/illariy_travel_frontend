@@ -1,105 +1,109 @@
 <div id="layoutSidenav_nav">
-  <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+  <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion"
+       style="background-color: #0A0A0A; border-right: 1px solid #2C2C2C;">
     <div class="sb-sidenav-menu">
       <div class="nav">
-        <div class="sb-sidenav-menu-heading">Pagina Principal</div>
-        <a routerLink="home" class="nav-link" href="charts.html">
-          <div class="sb-nav-link-icon">
-            <i class="fas fa-home"></i>
-          </div>
-          Inicio  
+        <!-- Encabezado -->
+        <div class="sb-sidenav-menu-heading" style="color: #DC2626; font-weight: 600;">Página Principal</div>
+
+        <a routerLink="home" class="nav-link"
+           style="color: #E5E5E5; transition: all 0.2s;"
+           onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+           onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">
+          <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
+          Inicio
         </a>
-        <div class="sb-sidenav-menu-heading">Datos</div>
-        
-        <a routerLink="mant/paquete" class="nav-link" href="charts.html">
+
+        <div class="sb-sidenav-menu-heading" style="color: #DC2626; font-weight: 600;">Datos</div>
+
+        <a routerLink="mant/paquete" class="nav-link"
+           style="color: #E5E5E5;"
+           onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+           onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">
           <div class="sb-nav-link-icon"><i class="fas fa-store"></i></div>
           Paquetes
         </a>
 
-        <a routerLink="mant/cliente" class="nav-link" href="charts.html">
+        <a routerLink="mant/cliente" class="nav-link"
+           style="color: #E5E5E5;"
+           onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+           onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">
           <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
           Clientes
         </a>
 
-        <a
-          class="nav-link collapsed"
-          href="#"
-          data-bs-toggle="collapse"
-          data-bs-target="#collapsePages"
-          aria-expanded="false"
-          aria-controls="collapsePages"
-        >
-          <div class="sb-nav-link-icon">
-            <i class="fas fa-cart-arrow-down"></i>
-          </div>
+        <!-- Menú desplegable: Reserva -->
+        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+           data-bs-target="#collapsePages" aria-expanded="false"
+           aria-controls="collapsePages"
+           style="color: #E5E5E5;"
+           onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+           onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">
+          <div class="sb-nav-link-icon"><i class="fas fa-cart-arrow-down"></i></div>
           Reserva
-          <div class="sb-sidenav-collapse-arrow">
-            <i class="fas fa-angle-down"></i>
-          </div>
+          <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
         </a>
-        <div
-          class="collapse"
-          id="collapsePages"
-          aria-labelledby="headingTwo"
-          data-bs-parent="#sidenavAccordion"
-        >
+        <div class="collapse" id="collapsePages"
+             aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
           <nav class="sb-sidenav-menu-nested nav">
-            <a routerLink="mant/reserva" class="nav-link" href="#">
-              Generar Reserva
-            </a>
-            <a routerLink="mant/pago" class="nav-link" href="#">
-              Detalle Reservas
-            </a>
+            <a routerLink="mant/reserva" class="nav-link"
+               style="color: #E5E5E5; padding-left: 2rem;"
+               onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+               onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">Generar Reserva</a>
+            <a routerLink="mant/pago" class="nav-link"
+               style="color: #E5E5E5; padding-left: 2rem;"
+               onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+               onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">Detalle Reservas</a>
           </nav>
         </div>
 
-        <ng-container *ngIf="usuario.tipoUsuario !== 'Empleado'">
-          <a
-            class="nav-link collapsed"
-            href="#"
-            data-bs-toggle="collapse"
-            data-bs-target="#collapseLayouts"
-            aria-expanded="false"
-            aria-controls="collapseLayouts"
-          >
+        <!-- ⚡ MANTENIMIENTO: solo visible si el rol es Administrador -->
+        <ng-container *ngIf="usuario.rol === 'Administrador'">
+          <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+             data-bs-target="#collapseLayouts" aria-expanded="false"
+             aria-controls="collapseLayouts"
+             style="color: #E5E5E5;"
+             onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+             onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">
             <div class="sb-nav-link-icon"><i class="fas fa-tools"></i></div>
             Mantenimiento
-            <div class="sb-sidenav-collapse-arrow">
-              <i class="fas fa-angle-down"></i>
-            </div>
+            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
           </a>
-        
-          <div
-            class="collapse"
-            id="collapseLayouts"
-            aria-labelledby="headingOne"
-            data-bs-parent="#sidenavAccordion"
-          >
+          <div class="collapse" id="collapseLayouts"
+               aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
             <nav class="sb-sidenav-menu-nested nav">
-              <a routerLink="mant/usuario" class="nav-link" href="#">Usuarios</a>
-              <a routerLink="mant/destino" class="nav-link" href="#">Destinos</a>
-              <!-- <a routerLink="mant/proveedor" class="nav-link" href="#">Proveedores</a> -->
+              <a routerLink="mant/usuario" class="nav-link"
+                 style="color: #E5E5E5; padding-left: 2rem;"
+                 onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+                 onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">Usuarios</a>
+              <a routerLink="mant/destino" class="nav-link"
+                 style="color: #E5E5E5; padding-left: 2rem;"
+                 onmouseover="this.style.backgroundColor='#1F1F1F'; this.style.color='#DC2626';"
+                 onmouseout="this.style.backgroundColor=''; this.style.color='#E5E5E5';">Destinos</a>
             </nav>
           </div>
-        </ng-container> 
-       
-        
-        <div class="sb-sidenav-menu-heading">Cerrar Sesión</div>
-        <a class="nav-link" (click)="logout()">
-          <button style="background-color: transparent; border: 0px; color: peru;"> 
-            <i class="fas fa-sign-out-alt"></i> 
+        </ng-container>
+
+        <div class="sb-sidenav-menu-heading" style="color: #DC2626; font-weight: 600;">Cerrar Sesión</div>
+        <a class="nav-link" (click)="logout()" style="cursor: pointer;">
+          <button style="background-color: transparent; border: 0px; color: #E5E5E5; transition: color 0.2s;"
+                  onmouseover="this.style.color='#DC2626';"
+                  onmouseout="this.style.color='#E5E5E5';">
+            <i class="fas fa-sign-out-alt"></i>
             Salir
-          </button>  
+          </button>
         </a>
       </div>
     </div>
-    <div class="sb-sidenav-footer">
-      <i class="fas fa-user"></i>
-      <div class="small"></div>
-      {{ usuario.nombre }}
-      <div class="small"></div>
-      {{ usuario.tipoUsuario }}
+
+    <!-- ⚡ FOOTER MEJORADO: nombre completo + rol -->
+    <div class="sb-sidenav-footer d-flex align-items-center px-3 py-2"
+         style="background-color: #111827; border-top: 1px solid #2C2C2C; color: #E5E5E5;">
+      <i class="fas fa-user-circle fa-lg me-2" style="color: #DC2626;"></i>
+      <div>
+        <div class="small fw-semibold text-light">{{ usuario.nombre }} {{ usuario.apellido }}</div>
+        <div class="small" style="color: #DC2626;">{{ usuario.rol }}</div>
+      </div>
     </div>
   </nav>
 </div>
-

@@ -1,11 +1,13 @@
 <div class="container mt-2">
   <h5 style="margin-right: 50px; text-align: center;">PAQUETES</h5>
-  <!-- EXPORTAR A PDF (Alineado a la derecha) -->
+  
   <div style="position: relative; text-align: center;">
+    <!-- COMPONENTE DE EXPORTACIÓN CON EL onBeforeExport -->
     <app-export-exlsx-cvs-pdf
       [columns]="headerColumns"
       [jsonData]="paqueteExport"
-      [fileName]="'ReporteStock'"
+      [fileName]="'ReportePaquetes'"
+      [onBeforeExport]="refrescarYExportar.bind(this)"
       style="position: absolute; right: 0; padding-right: 15px;">
     </app-export-exlsx-cvs-pdf>
     
@@ -16,27 +18,31 @@
       <input type="text" class="form-control" name="paquetes" placeholder="Buscar por paquete" [(ngModel)]="paquetes">
     </div>
   </div>
-  
+
+  <!-- INDICADOR DE CARGA MIENTRAS SE REFRESCAN LOS DATOS PARA EXPORTAR -->
+  <div *ngIf="exportando" class="text-center mt-1" style="font-size: 0.82rem; color: #555;">
+    <i class="fas fa-sync-alt fa-spin"></i> Actualizando datos para exportar...
+  </div>
 </div>
 
-
+<!-- TABLA (sin cambios, solo se muestra correctamente) -->
 <div class="container mt-3" style="overflow-y: scroll; height: 400px;">
   <table class="table table-bordered table-striped" id="tablaPaquetes">
     <thead class="text-white" style="position: sticky; top: -1; text-align: center;">
-      <tr style="background-color: black;"> <!--#198754-->
-      <th class="col-0">#</th>
-      <th class="col-1" hidden>ID PAQUETE</th>
-      <th class="col-1" hidden>ID DESTINO</th>
-      <th class="col-1">DESTINO</th>
-      <th class="col-1">NOMBRE PAQUETE</th>
-      <th class="col-3">DESCRIPCION</th>
-      <th class="col-0">DURACIÓN</th>
-      <th class="col-1">PRECIO BASE</th>
-      <th class="col-1">TIPO</th>
-      <th class="col-1">FECHA INICIO</th>
-      <th class="col-1">FECHA FIN</th>
-      <th class="col-1">INCLUSIONES</th>
-      <th class="col-1">EXCLUSIONES</th>
+      <tr style="background-color: black;">
+        <th class="col-0">#</th>
+        <th class="col-1" hidden>ID PAQUETE</th>
+        <th class="col-1" hidden>ID DESTINO</th>
+        <th class="col-1">DESTINO</th>
+        <th class="col-1">NOMBRE PAQUETE</th>
+        <th class="col-3">DESCRIPCION</th>
+        <th class="col-0">DURACIÓN</th>
+        <th class="col-1">PRECIO BASE</th>
+        <th class="col-1">TIPO</th>
+        <th class="col-1">FECHA INICIO</th>
+        <th class="col-1">FECHA FIN</th>
+        <th class="col-1">INCLUSIONES</th>
+        <th class="col-1">EXCLUSIONES</th>
         <th class="col-0">
           <button (click)="crearRegistro(template)" class="btn btn-primary btn-sm">
             <i class="fas fa-plus"></i>
@@ -45,67 +51,59 @@
       </tr>
     </thead>
     <tbody>
-      <tr
-        *ngFor="let d of paquete.slice().reverse() | filtroPaquetes:paquetes | paginate: { itemsPerPage: cantidadRegistros, currentPage: page },let i=index" style="text-align: center;">
+      <tr *ngFor="let d of paquete.slice().reverse() | filtroPaquetes:paquetes | paginate: { itemsPerPage: cantidadRegistros, currentPage: page }; let i = index" style="text-align: center;">
         <td>{{ (page - 1) * cantidadRegistros + i + 1 }}</td>
-        <td hidden>{{ d.iD_Paquete }} </td>
+        <td hidden>{{ d.iD_Paquete }}</td>
         <td>{{ destinoTipoMap.get(d.iD_Destino) }}</td>
         <td style="text-align: left;">{{ d.nombre }}</td>
         <td style="text-align: justify;">{{ d.descripcion }}</td>
         <td>{{ d.duracion }}</td>
-        <td>{{ d.precio_Base}} {{ destino_monedaTipoMap.get(d.iD_Destino) }}</td>
+        <td>{{ d.precio_Base }} {{ destino_monedaTipoMap.get(d.iD_Destino) }}</td>
         <td>{{ d.tipo }}</td>
-        <td>{{ d.fecha_Inicio}}</td>
-        <td>{{ d.fecha_Fin}}</td>
-        <td>{{ d.inclusiones}}</td>
-        <td>{{ d.exclusiones}}</td>
+        <td>{{ d.fecha_Inicio }}</td>
+        <td>{{ d.fecha_Fin }}</td>
+        <td>{{ d.inclusiones }}</td>
+        <td>{{ d.exclusiones }}</td>
         <td>
-          <!-- Contenedor del primer botón -->
           <div>
-            <!-- inicio boton editar -->
             <button style="width: 25px; display: flex; flex-direction: column; align-items: center;" class="btn btn-sm btn-success"
               (click)="editarRegistro(d, template)">
               <i class="fas fa-edit"></i>
             </button>
-            <!-- fin boton editar -->
           </div>
-          <!-- Fin del primer contenedor -->
           <div style="margin-top: 5px;"></div>
-          <!-- Contenedor del segundo botón -->
           <div>
             <button (click)="modalDelete(d)" style="width: 25px; display: flex; flex-direction: column; align-items: center;" class="btn btn-sm btn-danger">
               <i class="fas fa-trash"></i>
             </button>
           </div>
-          <!-- Fin del segundo contenedor -->
         </td>
       </tr>
     </tbody>
   </table>
 </div>
 
+<!-- MODAL TEMPLATE (sin cambios) -->
+<ng-template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">{{ tituloModal }}</h4>
+    <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-paquete-register [paquete]="paqueteSelected" (closeModalEmmit)="recibeCloseModal($event)">
+    </app-paquete-register>
+  </div>
+</ng-template>
+
+<!-- PAGINACIÓN -->
 <div class="input-group" style="display: flex; bottom: 0; justify-content: space-between; align-items: center; height: 0px;">
-  <!-- START PAGINATION -->
-  <ng-template #template>
-    <div class="modal-header">
-      <h4 class="modal-title pull-left">
-        {{ tituloModal }}
-      </h4>
-      <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
-        <span aria-hidden="true" class="visually-hidden">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <app-paquete-register [paquete]="paqueteSelected" (closeModalEmmit)="recibeCloseModal($event)">
-      </app-paquete-register>
-    </div>
-  </ng-template>
   <pagination-controls (pageChange)="page = $event" previousLabel="Anterior" nextLabel="Siguiente" style="position: fixed; bottom: 0;">
   </pagination-controls>
-  <!-- END PAGINATION -->
 </div>
 
-<!-- ... -->
+<!-- SELECTOR DE REGISTROS POR PÁGINA -->
 <div style="position: fixed; bottom: 20px; right: 20px;">
   <label for="cantidadRegistros" style="padding-right: 5px;">Mostrar registros:</label>
   <select id="cantidadRegistros" [(ngModel)]="cantidadRegistros" (change)="onRegistrosChange()" style="padding-right: 5px;">
@@ -115,4 +113,3 @@
     <option value="100">100</option>
   </select>
 </div>
-<!-- ... -->

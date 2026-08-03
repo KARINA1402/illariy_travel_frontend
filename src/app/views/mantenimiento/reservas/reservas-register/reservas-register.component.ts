@@ -430,7 +430,7 @@ export class ReservasRegisterComponent implements OnInit {
       fecha_Reserva: fechaFormateada,
       fecha_Pago: fechaFormateada,
       numero_Transaccion: '00' + (formValues.iD_Reserva || 0),
-      estatus: 'Reservado',
+      estatus: 'Pagado',
       precio_Total: this.total_price,
       numero_Personas: parseInt(formValues.numero_Personas) || 1,
       observaciones: formValues.observaciones || '',

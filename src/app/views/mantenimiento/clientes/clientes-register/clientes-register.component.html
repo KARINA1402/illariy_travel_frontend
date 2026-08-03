@@ -19,6 +19,68 @@
         </div>
     </div>
 
+    <!-- DNI / PASAPORTE (CONSULTA RENIEC) ──────────────────────────────── -->
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="form-group">
+                <label for="pasaporte"><strong>DNI / PASAPORTE</strong></label>
+
+                <div class="input-group">
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="pasaporte"
+                        formControlName="pasaporte"
+                        placeholder="Ingrese DNI (8 dígitos) o Pasaporte"
+                        (input)="onDNIInput($event)"
+                        maxlength="20">
+
+                    <!-- Spinner mientras consulta -->
+                    <span class="input-group-text bg-white" *ngIf="buscandoDNI">
+                        <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                    </span>
+
+                    <!-- Check verde si encontró -->
+                    <span class="input-group-text bg-success text-white"
+                          *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === true"
+                          title="DNI encontrado en RENIEC">
+                        <i class="fas fa-check"></i>
+                    </span>
+
+                    <!-- Advertencia si no encontró -->
+                    <span class="input-group-text bg-warning text-white"
+                          *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === false"
+                          title="DNI no encontrado">
+                        <i class="fas fa-exclamation"></i>
+                    </span>
+                </div>
+
+                <!-- Mensajes de estado -->
+                <div *ngIf="buscandoDNI" class="text-primary mt-1">
+                    <small>
+                        <i class="fas fa-circle-notch fa-spin"></i>
+                        Consultando RENIEC...
+                    </small>
+                </div>
+                <div *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === true"
+                     class="text-success mt-1">
+                    <small>
+                        <i class="fas fa-check-circle"></i>
+                        Datos encontrados y completados automáticamente
+                    </small>
+                </div>
+                <div *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === false"
+                     class="text-warning mt-1">
+                    <small>
+                        <i class="fas fa-info-circle"></i>
+                        DNI no encontrado — puedes completar los campos manualmente
+                    </small>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- CORREO -->
     <div class="row mt-3">
         <div class="col-12">
@@ -38,13 +100,20 @@
         </div>
     </div>
 
-    <!-- NOMBRES -->
+    <!-- NOMBRES (autocompletado por RENIEC) -->
     <div class="row mt-3">
         <div class="col-12">
             <div class="form-group">
                 <label for="nombre"><strong>NOMBRES</strong></label>
-                <input type="text" class="form-control" id="nombre" formControlName="nombre"
-                    placeholder="Ingrese Nombres">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="nombre" formControlName="nombre"
+                        placeholder="Ingrese Nombres">
+                    <span class="input-group-text bg-success text-white"
+                          *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === true"
+                          title="Completado automáticamente desde RENIEC">
+                        <i class="fas fa-magic"></i>
+                    </span>
+                </div>
                 <div class="text-danger mt-2" *ngIf="f['nombre']?.invalid && f['nombre']?.touched">
                     <small *ngIf="f['nombre']?.errors?.['required']">
                         <i class="fas fa-exclamation-circle"></i> El nombre es requerido
@@ -54,13 +123,20 @@
         </div>
     </div>
 
-    <!-- APELLIDOS -->
+    <!-- APELLIDOS (autocompletado por RENIEC) -->
     <div class="row mt-3">
         <div class="col-12">
             <div class="form-group">
                 <label for="apellido"><strong>APELLIDOS</strong></label>
-                <input type="text" class="form-control" id="apellido" formControlName="apellido"
-                    placeholder="Ingrese Apellidos">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="apellido" formControlName="apellido"
+                        placeholder="Ingrese Apellidos">
+                    <span class="input-group-text bg-success text-white"
+                          *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === true"
+                          title="Completado automáticamente desde RENIEC">
+                        <i class="fas fa-magic"></i>
+                    </span>
+                </div>
                 <div class="text-danger mt-2" *ngIf="f['apellido']?.invalid && f['apellido']?.touched">
                     <small *ngIf="f['apellido']?.errors?.['required']">
                         <i class="fas fa-exclamation-circle"></i> El apellido es requerido
@@ -105,14 +181,20 @@
         </div>
     </div>
 
-    <!-- FECHA NACIMIENTO -->
+    <!-- FECHA NACIMIENTO (autocompletado por RENIEC) -->
     <div class="row mt-3">
         <div class="col-12">
             <div class="form-group">
                 <label for="fecha_Nacimiento"><strong>FECHA NACIMIENTO</strong></label>
-                <input type="date" class="form-control" id="fecha_Nacimiento" formControlName="fecha_Nacimiento"
-                    placeholder="Ingrese Fecha Nacimiento" [max]="getMinDate()" [min]="getMaxDate()">
-
+                <div class="input-group">
+                    <input type="date" class="form-control" id="fecha_Nacimiento" formControlName="fecha_Nacimiento"
+                        placeholder="Ingrese Fecha Nacimiento" [max]="getMinDate()" [min]="getMaxDate()">
+                    <span class="input-group-text bg-success text-white"
+                          *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === true"
+                          title="Completado automáticamente desde RENIEC">
+                        <i class="fas fa-magic"></i>
+                    </span>
+                </div>
                 <div class="text-danger mt-2" *ngIf="f['fecha_Nacimiento']?.invalid && f['fecha_Nacimiento']?.touched">
                     <small *ngIf="f['fecha_Nacimiento']?.errors?.['required']">
                         <i class="fas fa-exclamation-circle"></i> La fecha de nacimiento es requerida
@@ -133,18 +215,25 @@
         </div>
     </div>
 
-    <!-- NACIONALIDAD -->
+    <!-- NACIONALIDAD (autocompletado por RENIEC: "Peruana") -->
     <div class="row mt-3">
         <div class="col-12">
             <div class="form-group">
                 <label for="nacionalidad"><strong>NACIONALIDAD</strong></label>
-                <select class="form-select" id="nacionalidad" formControlName="nacionalidad">
-                    <option value="Peruana">Peruana</option>
-                    <option value="Venezolana">Venezolana</option>
-                    <option value="Boliviana">Boliviana</option>
-                    <option value="Chilena">Chilena</option>
-                    <option value="Otros">Otros</option>
-                </select>
+                <div class="input-group">
+                    <select class="form-select" id="nacionalidad" formControlName="nacionalidad">
+                        <option value="Peruana">Peruana</option>
+                        <option value="Venezolana">Venezolana</option>
+                        <option value="Boliviana">Boliviana</option>
+                        <option value="Chilena">Chilena</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                    <span class="input-group-text bg-success text-white"
+                          *ngIf="!buscandoDNI && dniBuscado && dniEncontrado === true"
+                          title="Completado automáticamente desde RENIEC">
+                        <i class="fas fa-magic"></i>
+                    </span>
+                </div>
                 <div class="text-danger mt-2" *ngIf="f['nacionalidad']?.invalid && f['nacionalidad']?.touched">
                     <small *ngIf="f['nacionalidad']?.errors?.['required']">
                         <i class="fas fa-exclamation-circle"></i> La nacionalidad es requerida
@@ -161,24 +250,12 @@
                 <label for="nacionalidadOtros"><strong>ESPECIFICAR NACIONALIDAD</strong></label>
                 <input type="text" class="form-control" id="nacionalidadOtros" formControlName="nacionalidadOtros"
                     placeholder="Ej: Colombiana, Ecuatoriana, etc.">
-
                 <div class="text-danger mt-2"
                     *ngIf="f['nacionalidadOtros']?.invalid && f['nacionalidadOtros']?.touched">
                     <small *ngIf="f['nacionalidadOtros']?.errors?.['required']">
                         <i class="fas fa-exclamation-circle"></i> Por favor especifica la nacionalidad
                     </small>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PASAPORTE -->
-    <div class="row mt-3">
-        <div class="col-12">
-            <div class="form-group">
-                <label for="pasaporte"><strong>PASAPORTE</strong></label>
-                <input type="text" class="form-control" id="pasaporte" formControlName="pasaporte"
-                    placeholder="Ingrese Pasaporte (opcional)">
             </div>
         </div>
     </div>
@@ -206,10 +283,14 @@
     <!-- BOTONES -->
     <div class="row mt-4">
         <div class="col-12">
-            <button (click)="save()" [disabled]="myForm.invalid" class="btn btn-primary btn-sm float-end mr-2 ml-2">
+            <button (click)="save()"
+                    [disabled]="myForm.invalid || buscandoDNI"
+                    class="btn btn-primary btn-sm float-end mr-2 ml-2">
                 <i class="fas fa-save"></i> Guardar
             </button>
-            <button (click)="closeModal(false)" class="btn btn-danger btn-sm float-end mr-2 ml-2">
+            <button (click)="closeModal(false)"
+                    [disabled]="buscandoDNI"
+                    class="btn btn-danger btn-sm float-end mr-2 ml-2">
                 <i class="fas fa-ban"></i> Cancelar
             </button>
         </div>

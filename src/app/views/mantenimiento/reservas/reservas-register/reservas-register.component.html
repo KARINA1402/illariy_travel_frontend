@@ -1,65 +1,51 @@
 <link rel="stylesheet" href="./reservas-register.component.css" />
-<div class="container-fluid mt-2">
+<div class="container-fluid mt-3">
   <div class="row">
     <div class="col-lg-12">
 
       <!-- ══════════════════════════════════════════ -->
       <!-- DATOS DEL CLIENTE PRINCIPAL               -->
       <!-- ══════════════════════════════════════════ -->
-      <div class="form-group">
-        <h5 class="text-center">DETALLES DE LA RESERVA</h5>
+      <div class="section-title">
+        <h5>DETALLES DE LA RESERVA</h5>
       </div>
-      <div class="card">
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body">
           <form method="post" name="form_new_cliente_reserva" id="form_new_cliente_reserva">
             <input type="hidden" id="iD_Cliente" value="1" name="iD_Cliente" required />
-            <div class="row">
-              <div style="display: grid; margin-bottom: 10px;">
-                <input (click)="openListCliente(TemplateCliente)" type="button" class="btn btn-primary btn-sm"
-                  value="Seleccione Cliente Principal" />
+            <div class="row g-3">
+              <div class="col-12">
+                <button (click)="openListCliente(TemplateCliente)" type="button" class="btn btn-primary btn-sm">
+                  <i class="fas fa-user-plus"></i> Seleccione Cliente Principal
+                </button>
               </div>
-              <div class="col-lg-4">
-                <div class="form-group">
-                  <label>Nombre Completo</label>
-                  <input type="text" class="form-control" [value]="clienteSelect.nombre + ' ' + clienteSelect.apellido"
-                    disabled />
-                </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Nombre Completo</label>
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.nombre + ' ' + clienteSelect.apellido" disabled />
               </div>
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label>Teléfono</label>
-                  <input type="text" class="form-control" [value]="clienteSelect.telefono" disabled />
-                </div>
+              <div class="col-md-2">
+                <label class="form-label fw-semibold">Teléfono</label>
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.telefono" disabled />
               </div>
-              <div class="col-lg-4">
-                <div class="form-group">
-                  <label>Dirección</label>
-                  <input type="text" class="form-control" [value]="clienteSelect.direccion" disabled />
-                </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Dirección</label>
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.direccion" disabled />
               </div>
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label>Nacionalidad</label>
-                  <input type="text" class="form-control" [value]="clienteSelect.nacionalidad" disabled />
-                </div>
+              <div class="col-md-2">
+                <label class="form-label fw-semibold">Nacionalidad</label>
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.nacionalidad" disabled />
               </div>
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label>Pasaporte</label>
-                  <input type="text" class="form-control" [value]="clienteSelect.pasaporte" disabled />
-                </div>
+              <div class="col-md-2">
+                <label class="form-label fw-semibold">Pasaporte/DNI</label>
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.pasaporte" disabled />
               </div>
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label>Frecuencia Viajero</label>
-                  <input type="text" class="form-control" [value]="clienteSelect.frecuencia_Viajero" disabled />
-                </div>
+              <div class="col-md-2">
+                <label class="form-label fw-semibold">Frecuencia Viajero</label>
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.frecuencia_Viajero" disabled />
               </div>
-              <div class="col-lg-2">
-                <div class="form-group">
-                  <label>Fecha Nacimiento</label>
-                  <input type="text" class="form-control" [value]="clienteSelect.fecha_Nacimiento" disabled />
-                </div>
+              <div class="col-md-2">
+                <label class="form-label fw-semibold">Fecha Nacimiento</label>
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.fecha_Nacimiento" disabled />
               </div>
             </div>
           </form>
@@ -69,123 +55,125 @@
       <!-- ══════════════════════════════════════════ -->
       <!-- SECCIÓN ACOMPAÑANTES                      -->
       <!-- ══════════════════════════════════════════ -->
-      <div class="card mt-3" *ngIf="clienteSelect.iD_Cliente > 0">
-        <div class="card-header bg-info">
-          <h5 class="text-white mb-0">ACOMPAÑANTES DE LA RESERVA</h5>
+      <div class="card shadow-sm border-0 rounded-4 mb-4" *ngIf="clienteSelect.iD_Cliente > 0">
+        <div class="card-header bg-light border-0 rounded-top-4">
+          <h5 class="mb-0 fw-bold text-secondary">ACOMPAÑANTES DE LA RESERVA</h5>
         </div>
         <div class="card-body">
-
-          <!-- FIX: formGroup aquí para enlazar formControlName="numero_Personas" -->
           <form [formGroup]="myForm">
-            <div class="row">
-              <div class="col-lg-4">
-                <div class="form-group">
-                  <label><strong>Número de Personas (incluido usted):</strong></label>
-                  <input type="number" class="form-control" formControlName="numero_Personas" min="1" step="1" />
-                  <small class="text-muted">
-                    Titular: 1 &nbsp;|&nbsp; Acompañantes a agregar:
-                    <strong [style.color]="obtenerAcompanantesFaltantes() > 0 ? 'red' : 'green'">
-                      {{ obtenerAcompanantesFaltantes() }}
-                    </strong>
-                  </small>
-                </div>
+            <div class="row g-3 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Número de Personas (incluido usted)</label>
+                <input type="number" class="form-control form-control-sm" formControlName="numero_Personas" min="1" step="1" />
+                <small class="text-muted">
+                  Titular: 1 &nbsp;|&nbsp; Acompañantes a agregar:
+                  <strong [style.color]="obtenerAcompanantesFaltantes() > 0 ? '#dc3545' : '#198754'">
+                    {{ obtenerAcompanantesFaltantes() }}
+                  </strong>
+                </small>
               </div>
             </div>
           </form>
 
           <div class="row mt-3">
-            <div class="col-lg-12 d-flex align-items-center gap-2">
+            <div class="col-12 d-flex align-items-center gap-2">
               <button type="button" class="btn btn-success btn-sm" (click)="openListAcompanantes(TemplateAcompanantes)"
                 [disabled]="!puedeAgregarAcompanantes()">
-                <i class="fas fa-plus"></i> Agregar Acompañante
+                <i class="fas fa-plus-circle"></i> Agregar Acompañante
               </button>
               <small class="text-muted" *ngIf="myForm.get('numero_Personas')?.value <= 1">
                 Aumente el número de personas para habilitar este botón
               </small>
-              <small class="text-success"
-                *ngIf="obtenerAcompanantesFaltantes() === 0 && myForm.get('numero_Personas')?.value > 1">
+              <small class="text-success" *ngIf="obtenerAcompanantesFaltantes() === 0 && myForm.get('numero_Personas')?.value > 1">
                 <i class="fas fa-check-circle"></i> Todos los acompañantes han sido agregados
               </small>
             </div>
           </div>
 
-          <div class="row mt-3" *ngIf="clienteSelect.iD_Cliente > 0">
-            <div class="col-lg-12">
-              <h6>Personas en la Reserva:</h6>
-              <table class="table table-sm table-bordered">
-                <thead class="bg-light">
-                  <tr>
-                    <th>#</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Teléfono</th>
-                    <th>Nacionalidad</th>
-                    <th>Pasaporte</th>
-                    <th style="text-align:center;">Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="background-color:#e7f3ff;">
-                    <td>1</td>
-                    <td>{{ clienteSelect.nombre }}</td>
-                    <td>{{ clienteSelect.apellido }}</td>
-                    <td>{{ clienteSelect.telefono }}</td>
-                    <td>{{ clienteSelect.nacionalidad }}</td>
-                    <td>{{ clienteSelect.pasaporte }}</td>
-                    <td style="text-align:center;"><span class="badge bg-primary">TITULAR</span></td>
-                  </tr>
-                  <tr *ngFor="let acompanante of acompanantes; let i = index">
-                    <td>{{ i + 2 }}</td>
-                    <td>{{ acompanante.nombre }}</td>
-                    <td>{{ acompanante.apellido }}</td>
-                    <td>{{ acompanante.telefono }}</td>
-                    <td>{{ acompanante.nacionalidad }}</td>
-                    <td>{{ acompanante.pasaporte }}</td>
-                    <td style="text-align:center;">
-                      <button type="button" class="btn btn-danger btn-sm" (click)="removerAcompanante(i)">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="obtenerAcompanantesFaltantes() > 0">
-                    <td colspan="7" class="text-center text-warning">
-                      <i class="fas fa-exclamation-triangle"></i>
-                      Faltan {{ obtenerAcompanantesFaltantes() }} persona(s) por agregar
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="row mt-4" *ngIf="clienteSelect.iD_Cliente > 0">
+            <div class="col-12">
+              <h6 class="fw-semibold">Personas en la Reserva:</h6>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Nombre</th>
+                      <th>Apellido</th>
+                      <th>Teléfono</th>
+                      <th>Nacionalidad</th>
+                      <th>Pasaporte/DNI</th>
+                      <th class="text-center">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="table-primary">
+                      <td>1</td>
+                      <td>{{ clienteSelect.nombre }}</td>
+                      <td>{{ clienteSelect.apellido }}</td>
+                      <td>{{ clienteSelect.telefono }}</td>
+                      <td>{{ clienteSelect.nacionalidad }}</td>
+                      <td>{{ clienteSelect.pasaporte }}</td>
+                      <td class="text-center"><span class="badge bg-primary">TITULAR</span></td>
+                    </tr>
+                    <tr *ngFor="let acompanante of acompanantes; let i = index">
+                      <td>{{ i + 2 }}</td>
+                      <td>{{ acompanante.nombre }}</td>
+                      <td>{{ acompanante.apellido }}</td>
+                      <td>{{ acompanante.telefono }}</td>
+                      <td>{{ acompanante.nacionalidad }}</td>
+                      <td>{{ acompanante.pasaporte }}</td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-outline-danger btn-sm" (click)="removerAcompanante(i)">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="obtenerAcompanantesFaltantes() > 0">
+                      <td colspan="7" class="text-center text-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Faltan {{ obtenerAcompanantesFaltantes() }} persona(s) por agregar
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
 
       <!-- ══════════════════════════════════════════ -->
       <!-- DATOS DE LA RESERVA                       -->
       <!-- ══════════════════════════════════════════ -->
-      <h5 class="text-center" style="padding:15px;">DATOS DE LA RESERVA</h5>
+      <div class="section-title mt-4">
+        <h5>DATOS DE LA RESERVA</h5>
+      </div>
 
-      <div class="row">
-        <div class="col-lg-6">
-          <table class="table table-bordered">
-            <tr>
-              <th><label><i class="fas fa-user"></i> ATENDIDO POR:</label></th>
-              <td>{{ usuario.nombre }} {{ usuario.apellido }}</td>
-            </tr>
-          </table>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <div class="card bg-light border-0 rounded-3 p-2">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-user-circle fa-2x text-secondary"></i>
+              <div>
+                <strong>ATENDIDO POR:</strong><br />
+                {{ usuario.nombre }} {{ usuario.apellido }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="table-responsive">
-        <div style="display:grid; margin-bottom:10px;">
-          <input (click)="openListPaquete(TemplatePaquete)" type="button" class="btn btn-primary btn-sm float-end"
-            value="Seleccione paquete" />
+        <div class="mb-2">
+          <button (click)="openListPaquete(TemplatePaquete)" type="button" class="btn btn-primary btn-sm">
+            <i class="fas fa-boxes"></i> Seleccione paquete
+          </button>
         </div>
 
         <form [formGroup]="myForm">
-          <table class="table table-hover">
-            <thead class="bg-dark text-white">
+          <table class="table table-bordered table-hover align-middle bg-white">
+            <thead class="table-light">
               <tr>
                 <th class="d-none">ID Pago</th>
                 <th hidden>ID Paquete</th>
@@ -204,26 +192,23 @@
                 <ng-container *ngFor="let d of DetalleReservas.controls; let i = index">
                   <tr [formGroupName]="i">
                     <td class="d-none">
-                      <input readonly type="text" class="form-control" formControlName="iD_Pago" />
+                      <input readonly type="text" class="form-control form-control-sm" formControlName="iD_Pago" />
                     </td>
                     <td hidden class="d-none">
-                      <input readonly type="text" class="form-control" formControlName="iD_Paquete" />
+                      <input readonly type="text" class="form-control form-control-sm" formControlName="iD_Paquete" />
                     </td>
-                    <td><input readonly type="text" class="form-control" formControlName="html_nombre_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_nombre_paquete" /></td>
                     <td>
-                      <textarea readonly style="word-wrap:break-word;height:50px;width:300px;resize:none;"
-                        class="form-control" formControlName="html_descripcion_paquete"></textarea>
+                      <textarea readonly style="word-wrap:break-word; height:50px; width:300px; resize:none;" class="form-control form-control-sm" formControlName="html_descripcion_paquete"></textarea>
                     </td>
-                    <td><input readonly type="text" class="form-control" formControlName="html_duracion_paquete" /></td>
-                    <td><input readonly type="text" class="form-control" formControlName="html_fecha_inicio_paquete" />
-                    </td>
-                    <td><input readonly type="text" class="form-control" formControlName="html_fecha_fin_paquete" />
-                    </td>
-                    <td><input readonly type="text" class="form-control" formControlName="html_destino_paquete" /></td>
-                    <td><input readonly type="text" class="form-control" formControlName="html_moneda_monto" /></td>
-                    <td style="text-align:right;">
-                      <button (click)="removeElement(i)" class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash"></i>
+                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_duracion_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_fecha_inicio_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_fecha_fin_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_destino_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_moneda_monto" /></td>
+                    <td class="text-center">
+                      <button (click)="removeElement(i)" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash-alt"></i>
                       </button>
                     </td>
                   </tr>
@@ -233,53 +218,41 @@
 
             <tfoot id="detalle_totales">
               <tr>
-                <th>
-                  <br>
-                  <p>Observaciones:</p>
-                </th>
-                <th>
-                  <textarea style="width:300px;height:60px;resize:none;" placeholder="Observaciones"
-                    formControlName="observaciones"></textarea>
+                <th colspan="2">
+                  <label class="form-label fw-semibold">Observaciones:</label>
+                  <textarea style="width:100%; height:60px; resize:none;" class="form-control form-control-sm" placeholder="Observaciones" formControlName="observaciones"></textarea>
                 </th>
                 <th colspan="4">
-                  <br>
-                  <p class="text-end">Pagar con</p>
-                  <p class="text-end" style="color:#DC3545;">Vuelto</p>
-                  <p class="text-end" style="color:#008037;">Precio Total</p>
+                  <div class="text-end">Pagar con</div>
+                  <div class="text-end text-danger">Vuelto</div>
+                  <div class="text-end text-success">Precio Total</div>
                 </th>
                 <th colspan="3">
-                  <br>
-                  <p class="text-end">
-                    <input style="width:80px;" min="0" class="pagar" type="number" [(ngModel)]="pagar_con"
+                  <div class="text-end">
+                    <input style="width:100px;" min="0" class="form-control form-control-sm d-inline-block pagar" type="number" [(ngModel)]="pagar_con"
                       [ngModelOptions]="{standalone: true}" placeholder="Monto" (change)="calcularVuelto($event)" />
                     {{ nombre_moneda }}
-                  </p>
-                  <p class="text-end" style="color:#DC3545;">{{ vuelto | number:'1.2-2' }} {{ nombre_moneda }}</p>
-                  <p class="text-end" style="color:#008037;">
-                    <strong>{{ total_price | round }} {{ nombre_moneda }}</strong>
-                  </p>
+                  </div>
+                  <div class="text-end text-danger">{{ vuelto | number:'1.2-2' }} {{ nombre_moneda }}</div>
+                  <div class="text-end text-success fw-bold">{{ total_price | round }} {{ nombre_moneda }}</div>
                 </th>
               </tr>
             </tfoot>
           </table>
 
           <!-- BOTÓN GENERAR RESERVA + VALIDACIONES -->
-          <div style="text-align:center; margin-top:10px;">
+          <div class="text-center mt-3">
             <div *ngIf="DetalleReservas.length > 0 && total_price > 0 &&
               clienteSelect.iD_Cliente > 0 && obtenerAcompanantesFaltantes() === 0 && 
               pagar_con >= total_price">
-              <a (click)="realizarReserva(templatecomprobante)" class="btn btn-success text-center">
+              <a (click)="realizarReserva(templatecomprobante)" class="btn btn-success">
                 <i class="fas fa-save"></i> Generar Reserva
               </a>
             </div>
 
-            <!-- NUEVA ALERTA: Si el monto a pagar es menor al total -->
-            <div *ngIf="clienteSelect.iD_Cliente > 0 && total_price > 0 && pagar_con < total_price"
-              class="alert alert-danger mt-2">
-              <i class="fas fa-exclamation-circle"></i> El monto a pagar con debe ser <strong>mayor o igual</strong> al
-              precio total
+            <div *ngIf="clienteSelect.iD_Cliente > 0 && total_price > 0 && pagar_con < total_price" class="alert alert-danger mt-2">
+              <i class="fas fa-exclamation-circle"></i> El monto a pagar con debe ser <strong>mayor o igual</strong> al precio total
             </div>
-
             <div *ngIf="!clienteSelect.iD_Cliente" class="alert alert-info mt-2">
               <i class="fas fa-info-circle"></i> Seleccione un cliente principal para continuar
             </div>
@@ -292,8 +265,8 @@
             </div>
           </div>
 
-          <div style="margin-top:10px;">
-            <a (click)="listReserva(templatelistareservas)" class="btn btn-warning text-center">
+          <div class="mt-3">
+            <a (click)="listReserva(templatelistareservas)" class="btn btn-warning">
               <i class="fas fa-list"></i> Lista de Reservas
             </a>
           </div>
@@ -306,173 +279,160 @@
   <!-- TEMPLATE: Lista de Clientes               -->
   <!-- ══════════════════════════════════════════ -->
   <ng-template #TemplateCliente>
-    <div class="container mt-2">
-      <input (click)="modalRef?.hide()" type="button" class="btn btn-sm float-end" value="X" />
-      <h5 style="margin-right:50px;text-align:center;">SELECCIONE CLIENTE PRINCIPAL</h5>
-      <div class="input-group" style="display:flex">
-        <div class="input-group-text bg-white"><i class="fas fa-search"></i></div>
-        <input type="text" class="form-control" placeholder="Buscar cliente" [(ngModel)]="filtro"
-          [ngModelOptions]="{standalone:true}" />
+    <div class="modal-header bg-light">
+      <h5 class="modal-title">SELECCIONE CLIENTE PRINCIPAL</h5>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group mb-3">
+        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+        <input type="text" class="form-control" placeholder="Buscar cliente" [(ngModel)]="filtro" [ngModelOptions]="{standalone:true}" />
       </div>
+      <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-sm table-hover">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th>#</th>
+              <th hidden>ID</th>
+              <th hidden>USR</th>
+              <th>NOMBRES</th>
+              <th>APELLIDOS</th>
+              <th>TELÉFONO</th>
+              <th>DIRECCIÓN</th>
+              <th>NACIMIENTO</th>
+              <th>NACIONALIDAD</th>
+              <th>PAS./DNI</th>
+              <th class="text-center">OPCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of clienteList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
+              <td>{{ (page-1)*10+i+1 }}</td>
+              <td hidden>{{ d.iD_Cliente }}</td>
+              <td hidden>{{ d.iD_Usuario }}</td>
+              <td>{{ d.nombre }}</td>
+              <td>{{ d.apellido }}</td>
+              <td>{{ d.telefono }}</td>
+              <td>{{ d.direccion }}</td>
+              <td>{{ d.fecha_Nacimiento }}</td>
+              <td>{{ d.nacionalidad }}</td>
+              <td>{{ d.pasaporte }}</td>
+              <td class="text-center">
+                <button type="button" class="btn btn-sm btn-primary" (click)="onChangeCliente(d)">Seleccionar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente" class="mt-2"></pagination-controls>
     </div>
-    <div class="container mt-3" style="overflow-y:scroll;height:400px;">
-      <table class="table table-bordered table-striped">
-        <thead class="bg-dark text-white" style="position:sticky;top:-1px;">
-          <tr>
-            <th>#</th>
-            <th hidden>ID</th>
-            <th hidden>USR</th>
-            <th>NOMBRES</th>
-            <th>APELLIDOS</th>
-            <th>TELÉFONO</th>
-            <th>DIRECCIÓN</th>
-            <th>NACIMIENTO</th>
-            <th>NACIONALIDAD</th>
-            <th>PASAPORTE</th>
-            <th>FREC. VIAJERO</th>
-            <th style="text-align:center;">OPCIONES</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="let d of clienteList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
-            <td>{{ (page-1)*10+i+1 }}</td>
-            <td hidden>{{ d.iD_Cliente }}</td>
-            <td hidden>{{ d.iD_Usuario }}</td>
-            <td>{{ d.nombre }}</td>
-            <td>{{ d.apellido }}</td>
-            <td>{{ d.telefono }}</td>
-            <td>{{ d.direccion }}</td>
-            <td>{{ d.fecha_Nacimiento }}</td>
-            <td>{{ d.nacionalidad }}</td>
-            <td>{{ d.pasaporte }}</td>
-            <td>{{ d.frecuencia_Viajero }}</td>
-            <td style="text-align:center;">
-              <button type="button" class="btn btn-sm btn-primary" (click)="onChangeCliente(d)">Seleccionar</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente"
-      style="padding-top:15px;"></pagination-controls>
   </ng-template>
 
   <!-- ══════════════════════════════════════════ -->
   <!-- TEMPLATE: Lista de Paquetes               -->
   <!-- ══════════════════════════════════════════ -->
   <ng-template #TemplatePaquete>
-    <div class="container mt-2">
-      <input (click)="modalRef?.hide()" type="button" class="btn btn-sm float-end" value="X" />
-      <h5 style="margin-right:50px;text-align:center;">PAQUETES</h5>
-      <div class="input-group" style="display:flex">
-        <div class="input-group-text bg-white"><i class="fas fa-search"></i></div>
-        <input type="text" class="form-control" placeholder="Buscar paquete" [(ngModel)]="filtroPaquete"
-          [ngModelOptions]="{standalone:true}" />
+    <div class="modal-header bg-light">
+      <h5 class="modal-title">PAQUETES</h5>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group mb-3">
+        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+        <input type="text" class="form-control" placeholder="Buscar paquete" [(ngModel)]="filtroPaquete" [ngModelOptions]="{standalone:true}" />
       </div>
+      <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-sm table-hover">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th></th>
+              <th class="d-none">Id</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Duración</th>
+              <th>Fecha Inicio</th>
+              <th>Fecha Fin</th>
+              <th>Destino</th>
+              <th>Precio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of paquete | filtroPaqueteSelect: filtroPaquete | paginate:{itemsPerPage:5,currentPage:page}; let i=index">
+              <td><input type="radio" name="paqueteSelect" (change)="onChangePaquete(p)" /></td>
+              <td class="d-none">{{ p.iD_Paquete }}</td>
+              <td>{{ p.nombre }}</td>
+              <td>{{ p.descripcion }}</td>
+              <td>{{ p.duracion }}</td>
+              <td>{{ p.fecha_Inicio }}</td>
+              <td>{{ p.fecha_Fin }}</td>
+              <td>{{ destino_nombreTipoMap.get(p.iD_Destino) }}</td>
+              <td>{{ p.precio_Base }} {{ destino_monedaTipoMap.get(p.iD_Destino) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente" class="mt-2"></pagination-controls>
     </div>
-    <div class="container mt-3" style="overflow-y:scroll;height:400px;">
-      <table class="table table-bordered table-striped">
-        <thead class="bg-dark text-white" style="position:sticky;top:-1px;">
-          <tr>
-            <th>#</th>
-            <th class="d-none">Id</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Duración</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
-            <th>Destino</th>
-            <th>Precio</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            *ngFor="let p of paquete | filtroPaqueteSelect: filtroPaquete | paginate:{itemsPerPage:5,currentPage:page}; let i=index">
-            <td><input type="radio" name="paqueteSelect" (change)="onChangePaquete(p)" /></td>
-            <td class="d-none">{{ p.iD_Paquete }}</td>
-            <td>{{ p.nombre }}</td>
-            <td>{{ p.descripcion }}</td>
-            <td>{{ p.duracion }}</td>
-            <td>{{ p.fecha_Inicio }}</td>
-            <td>{{ p.fecha_Fin }}</td>
-            <td>{{ destino_nombreTipoMap.get(p.iD_Destino) }}</td>
-            <td>{{ p.precio_Base }} {{ destino_monedaTipoMap.get(p.iD_Destino) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente"
-      style="padding-top:15px;"></pagination-controls>
   </ng-template>
 
   <!-- ══════════════════════════════════════════ -->
   <!-- TEMPLATE: Lista de Acompañantes           -->
   <!-- ══════════════════════════════════════════ -->
   <ng-template #TemplateAcompanantes>
-    <div class="container mt-2">
-      <input (click)="modalRef?.hide()" type="button" class="btn btn-sm float-end" value="X" />
-      <h5 style="margin-right:50px;text-align:center;">SELECCIONE ACOMPAÑANTE(S)</h5>
-      <small class="text-muted">Faltan por agregar:
-        <strong style="color:red;">{{ obtenerAcompanantesFaltantes() }}</strong>
-      </small>
-      <div class="input-group" style="display:flex;margin-top:10px;">
-        <div class="input-group-text bg-white"><i class="fas fa-search"></i></div>
-        <input type="text" class="form-control" placeholder="Buscar acompañante" [(ngModel)]="filtro"
-          [ngModelOptions]="{standalone:true}" />
+    <div class="modal-header bg-light">
+      <h5 class="modal-title">SELECCIONE ACOMPAÑANTE(S)</h5>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+    </div>
+    <div class="modal-body">
+      <small class="text-muted">Faltan por agregar: <strong class="text-danger">{{ obtenerAcompanantesFaltantes() }}</strong></small>
+      <div class="input-group my-2">
+        <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+        <input type="text" class="form-control" placeholder="Buscar acompañante" [(ngModel)]="filtro" [ngModelOptions]="{standalone:true}" />
       </div>
+      <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-sm table-hover">
+          <thead class="table-light sticky-top">
+            <tr>
+              <th>#</th>
+              <th>NOMBRES</th>
+              <th>APELLIDOS</th>
+              <th>TELÉFONO</th>
+              <th>NACIONALIDAD</th>
+              <th>PASAPORTE/DNI</th>
+              <th class="text-center">OPCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="acompanantesList.length === 0">
+              <td colspan="7" class="text-center text-muted">No hay clientes disponibles</td>
+            </tr>
+            <tr *ngFor="let d of acompanantesList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
+              <td>{{ (page-1)*10+i+1 }}</td>
+              <td>{{ d.nombre }}</td>
+              <td>{{ d.apellido }}</td>
+              <td>{{ d.telefono }}</td>
+              <td>{{ d.nacionalidad }}</td>
+              <td>{{ d.pasaporte }}</td>
+              <td class="text-center">
+                <button type="button" class="btn btn-sm btn-success" (click)="agregarAcompanante(d)" [disabled]="obtenerAcompanantesFaltantes() === 0">
+                  <i class="fas fa-plus"></i> Agregar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente" class="mt-2"></pagination-controls>
     </div>
-    <div class="container mt-3" style="overflow-y:scroll;height:400px;">
-      <table class="table table-bordered table-striped">
-        <thead class="bg-dark text-white" style="position:sticky;top:-1px;">
-          <tr>
-            <th>#</th>
-            <th>NOMBRES</th>
-            <th>APELLIDOS</th>
-            <th>TELÉFONO</th>
-            <th>NACIONALIDAD</th>
-            <th>PASAPORTE</th>
-            <th style="text-align:center;">OPCIONES</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngIf="acompanantesList.length === 0">
-            <td colspan="7" class="text-center text-muted">No hay clientes disponibles</td>
-          </tr>
-          <tr
-            *ngFor="let d of acompanantesList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
-            <td>{{ (page-1)*10+i+1 }}</td>
-            <td>{{ d.nombre }}</td>
-            <td>{{ d.apellido }}</td>
-            <td>{{ d.telefono }}</td>
-            <td>{{ d.nacionalidad }}</td>
-            <td>{{ d.pasaporte }}</td>
-            <td style="text-align:center;">
-              <button type="button" class="btn btn-sm btn-success" (click)="agregarAcompanante(d)"
-                [disabled]="obtenerAcompanantesFaltantes() === 0">
-                <i class="fas fa-plus"></i> Agregar
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente"
-      style="padding-top:15px;"></pagination-controls>
   </ng-template>
 
   <!-- ══════════════════════════════════════════ -->
   <!-- TEMPLATE: Comprobante                     -->
-  <!-- FIX: usa acompanantesComprobante          -->
-  <!-- para que limpiarTablas() no afecte        -->
-  <!-- los datos mostrados en el modal           -->
   <!-- ══════════════════════════════════════════ -->
   <ng-template #templatecomprobante>
-    <div class="modal-header">
-      <h4 class="modal-title pull-left">{{ tituloModal }}</h4>
-      <button type="button" class="btn-close close pull-right" aria-label="Close" (click)="modalRef?.hide()">
-        <span aria-hidden="true" class="visually-hidden">&times;</span>
-      </button>
+    <div class="modal-header bg-light">
+      <h4 class="modal-title">{{ tituloModal }}</h4>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
     </div>
     <div class="modal-body">
       <app-reservas-comprobante [reserva]="miReserva" [acompanantes]="acompanantesComprobante"
@@ -485,9 +445,9 @@
   <!-- TEMPLATE: Lista de Reservas               -->
   <!-- ══════════════════════════════════════════ -->
   <ng-template #templatelistareservas>
-    <div class="modal-header">
-      <h4 class="modal-title pull-left">HISTORIAL RESERVAS REALIZADAS</h4>
-      <input (click)="modalRef?.hide()" type="button" class="btn btn-danger btn-sm float-end" value="X" />
+    <div class="modal-header bg-light">
+      <h4 class="modal-title">HISTORIAL RESERVAS REALIZADAS</h4>
+      <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
     </div>
     <div class="modal-body">
       <app-reservas-list></app-reservas-list>

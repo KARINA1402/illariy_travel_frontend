@@ -1,0 +1,17 @@
+/* Efecto hover para enlaces del sidenav */
+.nav-link:hover {
+  background-color: #1F1F1F !important;
+  color: #DC2626 !important;
+}
+
+/* Footer del sidenav */
+.sb-sidenav-footer {
+  background-color: #111827;
+  border-top: 1px solid #2C2C2C;
+  color: #E5E5E5;
+}
+
+.sb-sidenav-footer .fa-user-circle {
+  color: #DC2626;
+  font-size: 1.6rem;
+}

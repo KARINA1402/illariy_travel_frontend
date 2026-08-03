@@ -1,0 +1,14 @@
+{
+  "/api/verificape": {
+    "target": "https://api.verificape.com",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/verificape": ""
+    },
+    "headers": {
+      "Authorization": "Bearer vp_live_aada01fa0e4c4fa290b3e042fc612bb8"
+    },
+    "logLevel": "debug"
+  }
+}

@@ -1,70 +1,327 @@
-hr {
-  height: 3px;
-  background-color: black;
-}
-
-.boleto {
-  border-radius: 9px;
-  margin: 0 auto;
-  border-width: 1.7px;
-  border-style: solid;
-  width: 45%;
-  border-color: rgb(6, 6, 6);
-  padding: 11px;
-}
-
-table {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  table-layout: fixed;
-  font-size: 12px; /* Reducir el tamaño de la fuente */
-}
-
-th, td {
-  word-wrap: break-word;
-  padding: 1px; /* Reducir el relleno de las celdas */
-  text-align: center;
-}
-
-thead th {
-  background-color: rgb(5, 5, 5);
-  color: aliceblue;
-}
-
-tr:nth-of-type(odd) {
-  background-color: #e6e6e6;
-}
-
-.boleto2 {
-  text-align: center;
-}
-
-.header {
-  text-align: center;
-}
-
-#total {
+/* ===== ESTILOS GENERALES ===== */
+.comprobante-wrapper {
   display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  padding: 0 1rem;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f4f6f9;
+  font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
 }
 
-#totaltext {
-  width: 60%;
-  margin: 0;
-  padding: 0;
+.boleta-container {
+  width: 80mm;
+  background-color: #ffffff;
+  color: #1e2a3e;
+  font-size: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
 }
 
-#cajero {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 2rem;
+/* ===== ENCABEZADO ===== */
+.encabezado {
+  text-align: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #cbd5e1;
 }
 
-.no-padding {
-  margin: 0;
-  padding: 0;
+.logo-boleta {
+  width: 55px;
+  margin-bottom: 6px;
+  filter: grayscale(10%);
+}
+
+.nombre-empresa {
   font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #b91c1c; /* rojo sutil, solo en el nombre */
+}
+
+.subtitulo {
+  font-size: 8.5px;
+  color: #4b5563;
+  margin-top: 2px;
+}
+
+.direccion {
+  font-size: 8.5px;
+  color: #4b5563;
+  margin-top: 2px;
+}
+
+.contacto {
+  font-size: 8px;
+  color: #4b5563;
+  margin-top: 4px;
+}
+
+.ruc {
+  font-size: 8.5px;
+  font-weight: 500;
+  color: #334155;
+  margin-top: 4px;
+}
+
+.boleta-tag {
+  background-color: #f8fafc;
+  padding: 5px;
+  border-radius: 6px;
+  margin-top: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.boleta-tag span {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.nro-operacion {
+  font-family: monospace;
+  font-size: 8.5px;
+  margin-top: 3px;
+  color: #475569;
+}
+
+/* ===== INFO RESERVA ===== */
+.info-reserva {
+  margin-bottom: 12px;
+  font-size: 9.5px;
+  line-height: 1.4;
+}
+
+.linea {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.etiqueta {
+  color: #64748b;
+}
+
+.valor {
+  font-weight: 600;
+  text-align: right;
+  max-width: 70%;
+}
+
+.badge-personas {
+  background-color: #eef2ff;
+  padding: 0 5px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 9px;
+}
+
+/* ===== SECCIONES GENERALES ===== */
+.seccion {
+  margin-bottom: 14px;
+  padding-top: 8px;
+  border-top: 1px dashed #cbd5e1;
+}
+
+.seccion-titulo {
+  text-align: center;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 0.3px;
+  margin-bottom: 8px;
+}
+
+/* ===== TARJETAS DE PASAJEROS ===== */
+.pasajero-card {
+  background-color: #f9fafb;
+  border: 1px solid #e4e7eb;
+  border-radius: 6px;
+  padding: 6px;
+  margin-bottom: 6px;
+}
+
+.pasajero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.nombre {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 9.5px;
+}
+
+.badge-titular {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #1e40af;
+  background-color: #e0e7ff;
+  border: 1px solid #bfdbfe;
+  padding: 1px 5px;
+  border-radius: 12px;
+}
+
+.badge-acomp {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #166534;
+  background-color: #dcfce7;
+  border: 1px solid #bbf7d0;
+  padding: 1px 5px;
+  border-radius: 12px;
+}
+
+.pasajero-doc {
+  font-size: 8.5px;
+  color: #475569;
+  font-family: monospace;
+}
+
+/* ===== PAQUETE ===== */
+.paquete-card {
+  background-color: #f9fafb;
+  border: 1px solid #e4e7eb;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.paquete-nombre {
+  font-weight: 800;
+  font-size: 10px;
+  color: #0f172a;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.paquete-linea {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  margin-bottom: 4px;
+}
+
+.valor-precio {
+  font-weight: 700;
+  font-family: monospace;
+  color: #b91c1c; /* rojo solo en el precio */
+}
+
+/* ===== NOTAS ===== */
+.notas {
+  font-size: 8.5px;
+  line-height: 1.35;
+  color: #334155;
+}
+
+.nota {
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+
+.nota-incluye {
+  color: #2b6e3b;
+}
+
+.nota-excluye {
+  color: #b91c1c;
+}
+
+/* ===== RESUMEN DE VENTA ===== */
+.resumen-venta {
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+  margin: 12px 0;
+  background-color: #f8f8f3;
+  border-radius: 8px;
+}
+
+.resumen-titulo {
+  text-align: center;
+  font-size: 9.5px;
+  font-weight: 800;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.resumen-linea {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  margin-bottom: 5px;
+}
+
+.total-importe {
+  font-weight: 800;
+  font-size: 11px;
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+  color: #0f172a;
+}
+
+.monto-pagado {
+  font-weight: 700;
+  color: #15803d;
+}
+
+.vuelto {
+  font-weight: 700;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 5px;
+  margin-top: 3px;
+}
+
+/* ===== PIE DE BOLETA ===== */
+.pie-boleta {
+  text-align: center;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 8.5px;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.pie-boleta p {
+  margin: 0 0 4px 0;
+}
+
+.fecha-emision {
+  font-family: monospace;
+  font-size: 7.5px;
+  color: #6c757d;
+}
+
+/* ===== BOTÓN DE IMPRESIÓN ===== */
+.print-button-container {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.btn-print {
+  background-color: #b91c1c;
+  color: white;
+  border: none;
+  padding: 8px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-print:hover {
+  background-color: #991b1b;
+}
+
+/* ===== UTILIDADES ===== */
+.text-muted {
+  color: #6c757d;
 }

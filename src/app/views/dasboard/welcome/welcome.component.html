@@ -1,15 +1,134 @@
-<div class="container-img">
-  <img src="../../../../assets/imagenes/dashboard1.jpg" alt="Imagen 1">
-  <img src="../../../../assets/imagenes/dashboard.jpg" alt="Imagen 2">
-  <img src="../../../../assets/imagenes/dashboard2.jpg" alt="Imagen 3">
+<!-- Reloj (esquina superior derecha, ahora más estilizado) -->
+<div class="clock-container">
+  <i class="far fa-clock me-1"></i>
+  {{currentHours < 10 ? "0" + currentHours : currentHours}}:{{currentMinutes < 10 ? "0" + currentMinutes : currentMinutes}}:{{currentSeconds < 10 ? "0" + currentSeconds : currentSeconds}}
+  <span class="ms-1">{{am_pm}}</span>
 </div>
 
-<div class="clock-container" style="width: 120px; height: 30px;">
-  <div id="clock">
-    {{currentHours < 10 ? "0" + currentHours : currentHours}}:{{currentMinutes < 10 ? "0" + currentMinutes : currentMinutes}}:{{currentSeconds < 10 ? "0" + currentSeconds : currentSeconds}} {{am_pm}}
+<!-- Filtro de fechas + botones (estilo flotante) -->
+<div class="container-fluid px-4 pt-4">
+  <div class="filter-bar">
+    <div class="d-flex align-items-center gap-3">
+      <div class="date-input-group">
+        <i class="fas fa-calendar-alt"></i>
+        <input type="date" [value]="fechaInicio" (change)="fechaInicio = $any($event.target).value"
+               [min]="fechaMinimaStr" [max]="fechaMaximaStr">
+      </div>
+      <span class="text-muted">—</span>
+      <div class="date-input-group">
+        <i class="fas fa-calendar-alt"></i>
+        <input type="date" [value]="fechaFin" (change)="fechaFin = $any($event.target).value"
+               [min]="fechaMinimaStr" [max]="fechaMaximaStr">
+      </div>
+      <small class="text-light-emphasis" *ngIf="fechaMinimaGlobal && fechaMaximaGlobal">
+        <i class="fas fa-info-circle"></i> {{ fechaMinimaGlobal | date:'dd/MM/yyyy' }} – {{ fechaMaximaGlobal | date:'dd/MM/yyyy' }}
+      </small>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-glass" (click)="aplicarFiltro()" [disabled]="!fechasValidas()">
+        <i class="fas fa-filter me-1"></i> Filtrar
+      </button>
+      <button class="btn btn-glass btn-glass-success" (click)="exportarExcel()" [disabled]="!fechasValidas()">
+        <i class="fas fa-file-excel me-1"></i> Exportar
+      </button>
+    </div>
   </div>
 </div>
 
+<!-- KPI Cards – estilo glass -->
+<div class="container-fluid px-4 mt-4">
+  <div class="row g-3">
+    <div class="col-6 col-xl-3">
+      <div class="kpi-glass kpi-blue">
+        <div class="kpi-glass-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="kpi-glass-value">{{ totalReportes }}</div>
+        <div class="kpi-glass-label">Reservas</div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="kpi-glass kpi-green">
+        <div class="kpi-glass-icon"><i class="fas fa-dollar-sign"></i></div>
+        <div class="kpi-glass-value">S/ {{ totalIngresos | number:'1.2-2' }}</div>
+        <div class="kpi-glass-label">Ingresos</div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="kpi-glass kpi-purple">
+        <div class="kpi-glass-icon"><i class="fas fa-box-open"></i></div>
+        <div class="kpi-glass-value">{{ topPaquetes[0]?.nombre || '—' }}</div>
+        <div class="kpi-glass-label">Paquete #1</div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="kpi-glass kpi-pink">
+        <div class="kpi-glass-icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div class="kpi-glass-value">{{ topDestinos[0]?.nombre || '—' }}</div>
+        <div class="kpi-glass-label">Destino #1</div>
+      </div>
+    </div>
+  </div>
+</div>
 
-
-
+<!-- Gráficos: diseño diferente, dos filas de dos, luego una sola -->
+<div class="container-fluid px-4 mt-4">
+  <div class="row g-3">
+    <!-- Top Paquetes -->
+    <div class="col-12 col-lg-6">
+      <div class="chart-glass">
+        <div class="chart-glass-header">
+          <i class="fas fa-box-open me-2"></i> Top Paquetes
+        </div>
+        <div class="chart-glass-body">
+          <canvas id="chartTopPaquetes"></canvas>
+          <div class="no-data" *ngIf="topPaquetes.length === 0">Sin datos</div>
+        </div>
+      </div>
+    </div>
+    <!-- Top Destinos -->
+    <div class="col-12 col-lg-6">
+      <div class="chart-glass">
+        <div class="chart-glass-header">
+          <i class="fas fa-globe-americas me-2"></i> Top Destinos
+        </div>
+        <div class="chart-glass-body">
+          <canvas id="chartTopDestinos"></canvas>
+          <div class="no-data" *ngIf="topDestinos.length === 0">Sin datos</div>
+        </div>
+      </div>
+    </div>
+    <!-- Estados -->
+    <div class="col-12 col-lg-6">
+      <div class="chart-glass">
+        <div class="chart-glass-header">
+          <i class="fas fa-tasks me-2"></i> Estados
+        </div>
+        <div class="chart-glass-body">
+          <canvas id="chartEstados"></canvas>
+          <div class="no-data" *ngIf="resumenEstados.length === 0">Sin datos</div>
+        </div>
+      </div>
+    </div>
+    <!-- Personas por paquete -->
+    <div class="col-12 col-lg-6">
+      <div class="chart-glass">
+        <div class="chart-glass-header">
+          <i class="fas fa-users me-2"></i> Personas
+        </div>
+        <div class="chart-glass-body">
+          <canvas id="chartPersonas"></canvas>
+        </div>
+      </div>
+    </div>
+    <!-- Tendencia (una sola columna) -->
+    <div class="col-12">
+      <div class="chart-glass">
+        <div class="chart-glass-header">
+          <i class="fas fa-chart-line me-2"></i> Tendencia mensual
+        </div>
+        <div class="chart-glass-body" style="height: 280px;">
+          <canvas id="chartTendencia"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -15,9 +15,9 @@ export class SidenavComponent implements OnInit {
     private _router: Router) { }
 
   ngOnInit(): void {
-    this.obetenerUsuario();
+    this.obtenerUsuario();
   }
-  obetenerUsuario() {
+  obtenerUsuario() {
     this.usuario = this._sesionSevice.getUser();
   }
 
