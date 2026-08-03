@@ -45,7 +45,7 @@ export class ClientesRegisterComponent implements OnInit {
   dniEncontrado: boolean | null = null;
 
   private readonly TOKEN   = 'vp_live_aada01fa0e4c4fa290b3e042fc612bb8';
-  private readonly API_DNI = 'https://api.verificape.com/v2/dni';
+  private readonly API_DNI = '/api/verificape/v2/dni';
   private debounceTimer: any = null;
 
   readonly EDAD_MINIMA = 3;
