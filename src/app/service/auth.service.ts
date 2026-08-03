@@ -7,8 +7,8 @@ import { LoginRequestModel } from '../models/common/login-request.model';
 })
 export class AuthService {
 
-  // urlback = "https://hostingweb0-001-site4.atempurl.com/api/Auth";
-  urlback = "https://localhost:7047/api/Auth";
+  urlback = "https://illary.somee.com/api/Auth";
+  // urlback = "https://localhost:7047/api/Auth";
   constructor(
     private http: HttpClient
   ) { }
