@@ -21,7 +21,8 @@
               </div>
               <div class="col-md-4">
                 <label class="form-label fw-semibold">Nombre Completo</label>
-                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.nombre + ' ' + clienteSelect.apellido" disabled />
+                <input type="text" class="form-control form-control-sm"
+                  [value]="clienteSelect.nombre + ' ' + clienteSelect.apellido" disabled />
               </div>
               <div class="col-md-2">
                 <label class="form-label fw-semibold">Teléfono</label>
@@ -41,11 +42,13 @@
               </div>
               <div class="col-md-2">
                 <label class="form-label fw-semibold">Frecuencia Viajero</label>
-                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.frecuencia_Viajero" disabled />
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.frecuencia_Viajero"
+                  disabled />
               </div>
               <div class="col-md-2">
                 <label class="form-label fw-semibold">Fecha Nacimiento</label>
-                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.fecha_Nacimiento" disabled />
+                <input type="text" class="form-control form-control-sm" [value]="clienteSelect.fecha_Nacimiento"
+                  disabled />
               </div>
             </div>
           </form>
@@ -64,7 +67,8 @@
             <div class="row g-3 align-items-end">
               <div class="col-md-4">
                 <label class="form-label fw-semibold">Número de Personas (incluido usted)</label>
-                <input type="number" class="form-control form-control-sm" formControlName="numero_Personas" min="1" step="1" />
+                <input type="number" class="form-control form-control-sm" formControlName="numero_Personas" min="1"
+                  step="1" />
                 <small class="text-muted">
                   Titular: 1 &nbsp;|&nbsp; Acompañantes a agregar:
                   <strong [style.color]="obtenerAcompanantesFaltantes() > 0 ? '#dc3545' : '#198754'">
@@ -84,7 +88,8 @@
               <small class="text-muted" *ngIf="myForm.get('numero_Personas')?.value <= 1">
                 Aumente el número de personas para habilitar este botón
               </small>
-              <small class="text-success" *ngIf="obtenerAcompanantesFaltantes() === 0 && myForm.get('numero_Personas')?.value > 1">
+              <small class="text-success"
+                *ngIf="obtenerAcompanantesFaltantes() === 0 && myForm.get('numero_Personas')?.value > 1">
                 <i class="fas fa-check-circle"></i> Todos los acompañantes han sido agregados
               </small>
             </div>
@@ -197,15 +202,22 @@
                     <td hidden class="d-none">
                       <input readonly type="text" class="form-control form-control-sm" formControlName="iD_Paquete" />
                     </td>
-                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_nombre_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm"
+                        formControlName="html_nombre_paquete" /></td>
                     <td>
-                      <textarea readonly style="word-wrap:break-word; height:50px; width:300px; resize:none;" class="form-control form-control-sm" formControlName="html_descripcion_paquete"></textarea>
+                      <textarea readonly style="word-wrap:break-word; height:50px; width:300px; resize:none;"
+                        class="form-control form-control-sm" formControlName="html_descripcion_paquete"></textarea>
                     </td>
-                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_duracion_paquete" /></td>
-                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_fecha_inicio_paquete" /></td>
-                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_fecha_fin_paquete" /></td>
-                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_destino_paquete" /></td>
-                    <td><input readonly type="text" class="form-control form-control-sm" formControlName="html_moneda_monto" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm"
+                        formControlName="html_duracion_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm"
+                        formControlName="html_fecha_inicio_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm"
+                        formControlName="html_fecha_fin_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm"
+                        formControlName="html_destino_paquete" /></td>
+                    <td><input readonly type="text" class="form-control form-control-sm"
+                        formControlName="html_moneda_monto" /></td>
                     <td class="text-center">
                       <button (click)="removeElement(i)" class="btn btn-outline-danger btn-sm">
                         <i class="fas fa-trash-alt"></i>
@@ -220,7 +232,8 @@
               <tr>
                 <th colspan="2">
                   <label class="form-label fw-semibold">Observaciones:</label>
-                  <textarea style="width:100%; height:60px; resize:none;" class="form-control form-control-sm" placeholder="Observaciones" formControlName="observaciones"></textarea>
+                  <textarea style="width:100%; height:60px; resize:none;" class="form-control form-control-sm"
+                    placeholder="Observaciones" formControlName="observaciones"></textarea>
                 </th>
                 <th colspan="4">
                   <div class="text-end">Pagar con</div>
@@ -229,8 +242,9 @@
                 </th>
                 <th colspan="3">
                   <div class="text-end">
-                    <input style="width:100px;" min="0" class="form-control form-control-sm d-inline-block pagar" type="number" [(ngModel)]="pagar_con"
-                      [ngModelOptions]="{standalone: true}" placeholder="Monto" (change)="calcularVuelto($event)" />
+                    <input style="width:100px;" min="0" class="form-control form-control-sm d-inline-block pagar"
+                      type="number" [(ngModel)]="pagar_con" [ngModelOptions]="{standalone: true}" placeholder="Monto"
+                      (change)="calcularVuelto($event)" />
                     {{ nombre_moneda }}
                   </div>
                   <div class="text-end text-danger">{{ vuelto | number:'1.2-2' }} {{ nombre_moneda }}</div>
@@ -244,14 +258,20 @@
           <div class="text-center mt-3">
             <div *ngIf="DetalleReservas.length > 0 && total_price > 0 &&
               clienteSelect.iD_Cliente > 0 && obtenerAcompanantesFaltantes() === 0 && 
-              pagar_con >= total_price">
+              pagar_con >= total_price && esMayorDeEdad()">
               <a (click)="realizarReserva(templatecomprobante)" class="btn btn-success">
                 <i class="fas fa-save"></i> Generar Reserva
               </a>
             </div>
-
-            <div *ngIf="clienteSelect.iD_Cliente > 0 && total_price > 0 && pagar_con < total_price" class="alert alert-danger mt-2">
-              <i class="fas fa-exclamation-circle"></i> El monto a pagar con debe ser <strong>mayor o igual</strong> al precio total
+            <div *ngIf="clienteSelect.iD_Cliente > 0 && !esMayorDeEdad()" class="alert alert-danger mt-2">
+              <i class="fas fa-user-slash"></i>
+              El titular seleccionado es <strong>menor de edad</strong>. No se pueden generar reservas donde el titular
+              tenga menos de 18 años.
+            </div>
+            <div *ngIf="clienteSelect.iD_Cliente > 0 && total_price > 0 && pagar_con < total_price"
+              class="alert alert-danger mt-2">
+              <i class="fas fa-exclamation-circle"></i> El monto a pagar con debe ser <strong>mayor o igual</strong> al
+              precio total
             </div>
             <div *ngIf="!clienteSelect.iD_Cliente" class="alert alert-info mt-2">
               <i class="fas fa-info-circle"></i> Seleccione un cliente principal para continuar
@@ -286,7 +306,8 @@
     <div class="modal-body">
       <div class="input-group mb-3">
         <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Buscar cliente" [(ngModel)]="filtro" [ngModelOptions]="{standalone:true}" />
+        <input type="text" class="form-control" placeholder="Buscar cliente" [(ngModel)]="filtro"
+          [ngModelOptions]="{standalone:true}" />
       </div>
       <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-sm table-hover">
@@ -306,7 +327,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let d of clienteList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
+            <tr
+              *ngFor="let d of clienteList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
               <td>{{ (page-1)*10+i+1 }}</td>
               <td hidden>{{ d.iD_Cliente }}</td>
               <td hidden>{{ d.iD_Usuario }}</td>
@@ -324,7 +346,8 @@
           </tbody>
         </table>
       </div>
-      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente" class="mt-2"></pagination-controls>
+      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente"
+        class="mt-2"></pagination-controls>
     </div>
   </ng-template>
 
@@ -339,7 +362,8 @@
     <div class="modal-body">
       <div class="input-group mb-3">
         <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Buscar paquete" [(ngModel)]="filtroPaquete" [ngModelOptions]="{standalone:true}" />
+        <input type="text" class="form-control" placeholder="Buscar paquete" [(ngModel)]="filtroPaquete"
+          [ngModelOptions]="{standalone:true}" />
       </div>
       <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-sm table-hover">
@@ -357,7 +381,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let p of paquete | filtroPaqueteSelect: filtroPaquete | paginate:{itemsPerPage:5,currentPage:page}; let i=index">
+            <tr
+              *ngFor="let p of paquete | filtroPaqueteSelect: filtroPaquete | paginate:{itemsPerPage:5,currentPage:page}; let i=index">
               <td><input type="radio" name="paqueteSelect" (change)="onChangePaquete(p)" /></td>
               <td class="d-none">{{ p.iD_Paquete }}</td>
               <td>{{ p.nombre }}</td>
@@ -371,7 +396,8 @@
           </tbody>
         </table>
       </div>
-      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente" class="mt-2"></pagination-controls>
+      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente"
+        class="mt-2"></pagination-controls>
     </div>
   </ng-template>
 
@@ -384,10 +410,12 @@
       <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
     </div>
     <div class="modal-body">
-      <small class="text-muted">Faltan por agregar: <strong class="text-danger">{{ obtenerAcompanantesFaltantes() }}</strong></small>
+      <small class="text-muted">Faltan por agregar: <strong class="text-danger">{{ obtenerAcompanantesFaltantes()
+          }}</strong></small>
       <div class="input-group my-2">
         <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-        <input type="text" class="form-control" placeholder="Buscar acompañante" [(ngModel)]="filtro" [ngModelOptions]="{standalone:true}" />
+        <input type="text" class="form-control" placeholder="Buscar acompañante" [(ngModel)]="filtro"
+          [ngModelOptions]="{standalone:true}" />
       </div>
       <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
         <table class="table table-sm table-hover">
@@ -406,7 +434,8 @@
             <tr *ngIf="acompanantesList.length === 0">
               <td colspan="7" class="text-center text-muted">No hay clientes disponibles</td>
             </tr>
-            <tr *ngFor="let d of acompanantesList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
+            <tr
+              *ngFor="let d of acompanantesList | filtroClienteSelect: filtro | paginate:{itemsPerPage:10,currentPage:page}; let i=index">
               <td>{{ (page-1)*10+i+1 }}</td>
               <td>{{ d.nombre }}</td>
               <td>{{ d.apellido }}</td>
@@ -414,7 +443,8 @@
               <td>{{ d.nacionalidad }}</td>
               <td>{{ d.pasaporte }}</td>
               <td class="text-center">
-                <button type="button" class="btn btn-sm btn-success" (click)="agregarAcompanante(d)" [disabled]="obtenerAcompanantesFaltantes() === 0">
+                <button type="button" class="btn btn-sm btn-success" (click)="agregarAcompanante(d)"
+                  [disabled]="obtenerAcompanantesFaltantes() === 0">
                   <i class="fas fa-plus"></i> Agregar
                 </button>
               </td>
@@ -422,7 +452,8 @@
           </tbody>
         </table>
       </div>
-      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente" class="mt-2"></pagination-controls>
+      <pagination-controls (pageChange)="page=$event" previousLabel="Anterior" nextLabel="Siguiente"
+        class="mt-2"></pagination-controls>
     </div>
   </ng-template>
 

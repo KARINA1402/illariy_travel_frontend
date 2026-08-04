@@ -42,6 +42,7 @@ export class ReservasRegisterComponent implements OnInit {
   today: Date = new Date();
   pipe = new DatePipe('en-US');
   todayWithPipe = null;
+  edadMinima: number = 18;
 
   @Input() reservas: ReservasModel = new ReservasModel();
   @Output() closeModalEmmit = new EventEmitter<boolean>();
@@ -234,6 +235,23 @@ export class ReservasRegisterComponent implements OnInit {
     return Math.max(0, numeroPersonas - (this.acompanantes.length + 1));
   }
 
+  calcularEdad(fechaNacimiento: string | Date): number {
+    if (!fechaNacimiento) return 0;
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  }
+
+  esMayorDeEdad(): boolean {
+    if (!this.clienteSelect?.fecha_Nacimiento) return false;
+    return this.calcularEdad(this.clienteSelect.fecha_Nacimiento) >= this.edadMinima;
+  }
+
   puedeAgregarAcompanantes(): boolean {
     const numeroPersonas = parseInt(this.myForm.get('numero_Personas')?.value) || 1;
     return numeroPersonas > 1 && this.obtenerAcompanantesFaltantes() > 0;
@@ -413,6 +431,17 @@ export class ReservasRegisterComponent implements OnInit {
         title: 'Monto insuficiente', 
         text: 'El monto con el que paga debe ser mayor o igual al precio total.', 
         showConfirmButton: true 
+      });
+      return;
+    }
+
+    if (!this.esMayorDeEdad()) {
+      Swal.fire({
+        position: 'center',
+        icon: 'error',
+        title: 'El titular debe ser mayor de edad',
+        text: 'No se pueden realizar reservas para menores de 18 años como titulares.',
+        showConfirmButton: true
       });
       return;
     }
