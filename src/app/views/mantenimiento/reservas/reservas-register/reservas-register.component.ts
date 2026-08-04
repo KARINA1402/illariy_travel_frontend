@@ -235,10 +235,33 @@ export class ReservasRegisterComponent implements OnInit {
     return Math.max(0, numeroPersonas - (this.acompanantes.length + 1));
   }
 
+  private parseFechaNacimiento(fechaNacimiento: string | Date): Date | null {
+    if (!fechaNacimiento) return null;
+
+    if (fechaNacimiento instanceof Date) {
+      return isNaN(fechaNacimiento.getTime()) ? null : fechaNacimiento;
+    }
+
+    const str = fechaNacimiento.trim();
+
+    const match = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (match) {
+      const dia = parseInt(match[1], 10);
+      const mes = parseInt(match[2], 10);
+      const anio = parseInt(match[3], 10);
+      const fecha = new Date(anio, mes - 1, dia);
+      return isNaN(fecha.getTime()) ? null : fecha;
+    }
+
+    const fechaIso = new Date(str);
+    return isNaN(fechaIso.getTime()) ? null : fechaIso;
+  }
+
   calcularEdad(fechaNacimiento: string | Date): number {
-    if (!fechaNacimiento) return 0;
+    const nacimiento = this.parseFechaNacimiento(fechaNacimiento);
+    if (!nacimiento) return 0;
+
     const hoy = new Date();
-    const nacimiento = new Date(fechaNacimiento);
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
     const mes = hoy.getMonth() - nacimiento.getMonth();
     if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
