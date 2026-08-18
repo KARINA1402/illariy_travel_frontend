@@ -236,8 +236,30 @@ export class ClientesRegisterComponent implements OnInit {
     this.closeModalEmmit.emit(res);
   }
 
+  private async clienteYaExiste(correo: string, dni: string, idActual?: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      this._clientesService.getAll().subscribe({
+        next: (lista) => {
+          const existe = lista.some(c => {
+            // Si es edición, ignorar el mismo registro
+            if (idActual && c.iD_Cliente === idActual) return false;
+
+            const mismoCorreo = c.correo?.toLowerCase() === correo?.toLowerCase();
+            const mismoDni = c.pasaporte?.trim() === dni?.trim();
+            return mismoCorreo || mismoDni;
+          });
+          resolve(existe);
+        },
+        error: (err) => {
+          console.error('Error al verificar clientes:', err);
+          resolve(false); // En caso de error, permitir guardar (o mostrar error)
+        }
+      });
+    });
+  }
+
   // ─── GUARDAR ─────────────────────────────────────────────────────
-  save() {
+  async save() {
     if (this.myForm.invalid) {
       Swal.fire({
         position: 'center',
@@ -249,7 +271,44 @@ export class ClientesRegisterComponent implements OnInit {
       return;
     }
 
-    this.clientes = this.myForm.getRawValue();
+    // Obtener datos del formulario
+    const formValues = this.myForm.getRawValue();
+    const correo = formValues.correo?.trim();
+    const dni = formValues.pasaporte?.trim();
+    const idActual = formValues.iD_Cliente; // 0 si es nuevo
+
+    // Verificar duplicados SOLO cuando es un nuevo registro (id = 0)
+    if (idActual === 0) {
+      const existe = await this.clienteYaExiste(correo, dni, idActual);
+      if (existe) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Cliente ya registrado',
+          text: 'Ya existe un cliente con este correo o DNI en el sistema.',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
+    }
+
+    // Si es edición, también verificamos, pero permitimos que sea el mismo registro
+    if (idActual !== 0) {
+      const existe = await this.clienteYaExiste(correo, dni, idActual);
+      if (existe) {
+        Swal.fire({
+          position: 'center',
+          icon: 'error',
+          title: 'Conflicto',
+          text: 'El correo o DNI pertenece a otro cliente registrado.',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
+    }
+
+    // Continuar con la creación o actualización
+    this.clientes = formValues;
 
     // Si seleccionó "Otros", usar el valor del input
     if (this.myForm.get('nacionalidad')?.value === 'Otros') {
