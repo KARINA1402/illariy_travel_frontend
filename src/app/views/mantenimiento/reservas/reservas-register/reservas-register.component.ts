@@ -538,6 +538,7 @@ export class ReservasRegisterComponent implements OnInit {
   }
 
   async realizarReserva(template: TemplateRef<any>) {
+    console.log('%c🔴 VERSION NUEVA - realizarReserva EJECUTADO', 'background: red; color: white; font-size: 20px; padding: 5px;');
     // ─── 1. VALIDACIONES EXISTENTES ──────────────────────
     if (!this.clienteSelect.iD_Cliente || !this.paqueteselect.iD_Paquete) {
       Swal.fire({ icon: 'warning', title: 'Seleccione cliente y paquete' });
