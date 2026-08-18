@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  uri_back_end:"https://illary.somee.com/api/"
+  uri_back_end:"https://illary.bsite.net/api/"
   // uri_back_end:"https://localhost:7047/api/"
 };
 
