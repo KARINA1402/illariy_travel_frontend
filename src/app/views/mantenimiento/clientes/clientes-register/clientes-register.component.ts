@@ -8,6 +8,7 @@ import { DatePipe } from '@angular/common';
 import { UsuarioModel } from 'src/app/models/usuario.model';
 import { SesionService } from 'src/app/service/sesion.service';
 import { environment } from 'src/environments/environment';
+import { firstValueFrom } from 'rxjs';
 
 interface VerificaPeRespuesta {
   success: boolean;
@@ -236,30 +237,42 @@ export class ClientesRegisterComponent implements OnInit {
     this.closeModalEmmit.emit(res);
   }
 
-  private async clienteYaExiste(correo: string, dni: string, idActual?: number): Promise<boolean> {
-    return new Promise((resolve) => {
-      this._clientesService.getAll().subscribe({
-        next: (lista) => {
-          const existe = lista.some(c => {
-            // Si es edición, ignorar el mismo registro
-            if (idActual && c.iD_Cliente === idActual) return false;
+  private async clienteYaExiste(correo: string | null | undefined, dni: string | null | undefined, idActual: number): Promise<boolean> {
+    try {
+      // Obtener todos los clientes (idealmente debería ser un servicio con filtro, pero asumimos que getAll devuelve todos)
+      const lista = await firstValueFrom(this._clientesService.getAll());
 
-            const mismoCorreo = c.correo?.toLowerCase() === correo?.toLowerCase();
-            const mismoDni = c.pasaporte?.trim() === dni?.trim();
-            return mismoCorreo || mismoDni;
-          });
-          resolve(existe);
-        },
-        error: (err) => {
-          console.error('Error al verificar clientes:', err);
-          resolve(false); // En caso de error, permitir guardar (o mostrar error)
-        }
+      // Normalizar valores
+      const correoNormalizado = correo?.trim().toLowerCase() || '';
+      const dniNormalizado = dni?.trim() || '';
+
+      // Si ambos están vacíos, no hay duplicado posible
+      if (!correoNormalizado && !dniNormalizado) return false;
+
+      // Buscar coincidencia
+      return lista.some(cliente => {
+        // Saltar el mismo registro en edición
+        if (idActual !== 0 && cliente.iD_Cliente === idActual) return false;
+
+        const correoCliente = cliente.correo?.trim().toLowerCase() || '';
+        const dniCliente = cliente.pasaporte?.trim() || '';
+
+        // Comparar solo si los campos no están vacíos
+        const mismoCorreo = correoNormalizado && correoCliente === correoNormalizado;
+        const mismoDni = dniNormalizado && dniCliente === dniNormalizado;
+
+        return mismoCorreo || mismoDni;
       });
-    });
+    } catch (error) {
+      console.error('Error al verificar duplicados:', error);
+      // En caso de error, permitimos el guardado (o podrías lanzar una excepción)
+      return false;
+    }
   }
 
   // ─── GUARDAR ─────────────────────────────────────────────────────
   async save() {
+    // 1. Validar formulario
     if (this.myForm.invalid) {
       Swal.fire({
         position: 'center',
@@ -271,14 +284,14 @@ export class ClientesRegisterComponent implements OnInit {
       return;
     }
 
-    // Obtener datos del formulario
+    // 2. Obtener valores del formulario
     const formValues = this.myForm.getRawValue();
     const correo = formValues.correo?.trim();
     const dni = formValues.pasaporte?.trim();
-    const idActual = formValues.iD_Cliente; // 0 si es nuevo
+    const idActual = formValues.iD_Cliente || 0; // 0 para nuevo, >0 para edición
 
-    // Verificar duplicados SOLO cuando es un nuevo registro (id = 0)
-    if (idActual === 0) {
+    // 3. Verificar duplicados (si hay correo o DNI)
+    if (correo || dni) {
       const existe = await this.clienteYaExiste(correo, dni, idActual);
       if (existe) {
         Swal.fire({
@@ -292,59 +305,44 @@ export class ClientesRegisterComponent implements OnInit {
       }
     }
 
-    // Si es edición, también verificamos, pero permitimos que sea el mismo registro
-    if (idActual !== 0) {
-      const existe = await this.clienteYaExiste(correo, dni, idActual);
-      if (existe) {
+    // 4. Preparar objeto cliente (incluyendo nacionalidad "Otros")
+    let clienteData = { ...formValues };
+
+    if (clienteData.nacionalidad === 'Otros') {
+      clienteData.nacionalidad = this.myForm.get('nacionalidadOtros')?.value || 'Otros';
+    }
+
+    // 5. Formatear fecha para el servidor (DD/MM/YYYY)
+    clienteData.fecha_Nacimiento = this.formatDateForServer(clienteData.fecha_Nacimiento);
+
+    // 6. Asignar usuario autenticado (solo para nuevo)
+    if (idActual === 0) {
+      const authenticatedUser = this._sesionService.getUser();
+      if (authenticatedUser) {
+        clienteData.iD_Usuario = authenticatedUser.iD_Usuario;
+      } else {
         Swal.fire({
           position: 'center',
           icon: 'error',
-          title: 'Conflicto',
-          text: 'El correo o DNI pertenece a otro cliente registrado.',
-          confirmButtonText: 'Aceptar'
+          title: 'Usuario no autenticado',
+          showConfirmButton: false,
+          timer: 1650
         });
         return;
       }
     }
 
-    // Continuar con la creación o actualización
-    this.clientes = formValues;
+    // 7. Guardar o actualizar
+    this.clientes = clienteData; // actualizar el modelo local
 
-    // Si seleccionó "Otros", usar el valor del input
-    if (this.myForm.get('nacionalidad')?.value === 'Otros') {
-      this.clientes.nacionalidad = this.myForm.get('nacionalidadOtros')?.value;
-    }
-
-    if (this.clientes.iD_Cliente == 0) {
-      this.createClientes();
+    if (idActual === 0) {
+      this.createClientes(clienteData);
     } else {
-      this.updateClientes();
+      this.updateClientes(clienteData);
     }
   }
 
-  createClientes() {
-    let cliente: any = this.myForm.value;
-
-    if (this.myForm.get('nacionalidad')?.value === 'Otros') {
-      cliente.nacionalidad = this.myForm.get('nacionalidadOtros')?.value;
-    }
-
-    cliente.fecha_Nacimiento = this.formatDateForServer(cliente.fecha_Nacimiento);
-    const authenticatedUser = this._sesionService.getUser();
-
-    if (authenticatedUser) {
-      cliente.iD_Usuario = authenticatedUser.iD_Usuario;
-    } else {
-      Swal.fire({
-        position: 'center',
-        icon: 'error',
-        title: 'Usuario no autenticado',
-        showConfirmButton: false,
-        timer: 1650
-      });
-      return;
-    }
-
+  createClientes(cliente: any) {
     this._clientesService.create(cliente).subscribe(
       (data: ClienteModel) => {
         Swal.fire({
@@ -370,15 +368,7 @@ export class ClientesRegisterComponent implements OnInit {
     );
   }
 
-  updateClientes() {
-    let cliente: any = this.myForm.value;
-
-    if (this.myForm.get('nacionalidad')?.value === 'Otros') {
-      cliente.nacionalidad = this.myForm.get('nacionalidadOtros')?.value;
-    }
-
-    cliente.fecha_Nacimiento = this.formatDateForServer(cliente.fecha_Nacimiento);
-
+  updateClientes(cliente: any) {
     this._clientesService.update(cliente).subscribe(
       (data: ClienteModel) => {
         Swal.fire({
