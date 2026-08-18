@@ -290,7 +290,13 @@ export class ReservasRegisterComponent implements OnInit {
 
     // Obtener reservas del cliente
     const reservas = await firstValueFrom(this._reservasService.getAll());
-    const reservasCliente = reservas.filter(r => r.iD_Cliente === clienteId);
+    console.log('RAW reservas de la API:', reservas); // 👈 revisa la forma real de cada objeto
+    console.log('clienteId buscado:', clienteId, typeof clienteId);
+    const reservasCliente = reservas.filter(r => {
+      console.log('comparando', r.iD_Cliente, typeof r.iD_Cliente, 'vs', clienteId, typeof clienteId);
+      return Number(r.iD_Cliente) === Number(clienteId); // normalizado
+    });
+    console.log('reservasCliente encontradas:', reservasCliente);
 
     if (reservasCliente.length === 0) return false;
 
