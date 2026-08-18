@@ -20,6 +20,7 @@ import { DetalleReservaModel } from 'src/app/models/detalleReservas.model';
 import { Pipe, PipeTransform } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Pipe({ name: 'round' })
@@ -137,6 +138,10 @@ export class ReservasRegisterComponent implements OnInit {
       }
       this.calcularTotalPrice();
     });
+
+    this._produtoservice.getAll().subscribe(data => {
+      this.paquetesCache = data;
+    });
   }
 
   refreshDestinotipoMap() {
@@ -233,6 +238,97 @@ export class ReservasRegisterComponent implements OnInit {
   obtenerAcompanantesFaltantes(): number {
     const numeroPersonas = parseInt(this.myForm.get('numero_Personas')?.value) || 1;
     return Math.max(0, numeroPersonas - (this.acompanantes.length + 1));
+  }
+
+  /**
+ * Convierte una fecha en formato "DD/MM/YYYY" a objeto Date
+ */
+
+  private paquetesCache: PaqueteModel[] = [];
+
+  private parseFecha(fechaStr: string): Date | null {
+    if (!fechaStr) return null;
+    const partes = fechaStr.split('/');
+    if (partes.length === 3) {
+      const dia = parseInt(partes[0], 10);
+      const mes = parseInt(partes[1], 10) - 1;
+      const anio = parseInt(partes[2], 10);
+      const fecha = new Date(anio, mes, dia);
+      return isNaN(fecha.getTime()) ? null : fecha;
+    }
+    return null;
+  }
+
+  /**
+   * Compara dos rangos de fechas y determina si se superponen (con margen de 1 día)
+   * Para evitar que haya menos de 24h entre una reserva y la siguiente,
+   * se agrega 1 día extra al fin de la reserva existente.
+   */
+  private fechasSeCruzan(
+    inicio1: Date | null,
+    fin1: Date | null,
+    inicio2: Date | null,
+    fin2: Date | null
+  ): boolean {
+    if (!inicio1 || !fin1 || !inicio2 || !fin2) return false;
+
+    // Clonamos y agregamos 1 día de margen al fin de la reserva existente
+    const fin2ConMargen = new Date(fin2);
+    fin2ConMargen.setDate(fin2ConMargen.getDate() + 1);
+
+    // Cruce si los rangos se tocan o superponen
+    return inicio1 <= fin2ConMargen && inicio2 <= fin1;
+  }
+
+  /**
+   * Verifica si el cliente seleccionado tiene alguna reserva que cruce
+   * con las fechas del nuevo paquete.
+   */
+  private async verificarCrucesFechas(): Promise<boolean> {
+    const clienteId = this.clienteSelect.iD_Cliente;
+    if (!clienteId) return false;
+
+    // Obtener reservas del cliente
+    const reservas = await firstValueFrom(this._reservasService.getAll());
+    const reservasCliente = reservas.filter(r => r.iD_Cliente === clienteId);
+
+    if (reservasCliente.length === 0) return false;
+
+    // Obtener el nuevo paquete y sus fechas
+    const nuevoPaquete = this.paqueteselect;
+    const nuevaFechaInicio = this.parseFecha(nuevoPaquete.fecha_Inicio);
+    const nuevaFechaFin = this.parseFecha(nuevoPaquete.fecha_Fin);
+
+    // Si no tenemos fechas, no podemos validar (permitimos por seguridad)
+    if (!nuevaFechaInicio || !nuevaFechaFin) return false;
+
+    // Recorrer reservas existentes
+    for (const reserva of reservasCliente) {
+      // Obtener el paquete de la reserva (usando caché si existe)
+      let paqueteReserva = this.paquetesCache.find(p => p.iD_Paquete === reserva.iD_Paquete);
+      if (!paqueteReserva) {
+        // Si no está en caché, lo obtenemos de la API (pero intentamos con getAll)
+        const allPaquetes = await firstValueFrom(this._produtoservice.getAll());
+        this.paquetesCache = allPaquetes; // actualizar caché
+        paqueteReserva = allPaquetes.find(p => p.iD_Paquete === reserva.iD_Paquete);
+      }
+      if (!paqueteReserva) continue;
+
+      const fechaInicioExistente = this.parseFecha(paqueteReserva.fecha_Inicio);
+      const fechaFinExistente = this.parseFecha(paqueteReserva.fecha_Fin);
+      if (!fechaInicioExistente || !fechaFinExistente) continue;
+
+      // Si hay cruce, retornamos true
+      if (this.fechasSeCruzan(
+        nuevaFechaInicio, nuevaFechaFin,
+        fechaInicioExistente, fechaFinExistente
+      )) {
+        // Opcional: guardar información del paquete conflictivo para mostrar
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private parseFechaNacimiento(fechaNacimiento: string | Date): Date | null {
@@ -435,7 +531,7 @@ export class ReservasRegisterComponent implements OnInit {
     return `${dia}/${mes}/${anio} ${horaFormato}:${minutos} ${ampm}`;
   }
 
-  realizarReserva(template: TemplateRef<any>) {
+  async realizarReserva(template: TemplateRef<any>) {
     // ─── 1. VALIDACIONES EXISTENTES ──────────────────────
     if (!this.clienteSelect.iD_Cliente || !this.paqueteselect.iD_Paquete) {
       Swal.fire({ icon: 'warning', title: 'Seleccione cliente y paquete' });
@@ -454,31 +550,49 @@ export class ReservasRegisterComponent implements OnInit {
       return;
     }
 
-    // ─── 2. OBTENER DATOS DEL FORMULARIO ──────────────────
+    // ─── 2. VALIDACIÓN DE CRUCES DE FECHAS ─────────────────
+    try {
+      const hayCruce = await this.verificarCrucesFechas();
+      if (hayCruce) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Conflicto de fechas',
+          text: 'Este cliente ya tiene una reserva que se superpone con las fechas del paquete seleccionado. Por favor, selecciona otro paquete o ajusta las fechas.',
+          confirmButtonText: 'Aceptar'
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Error al verificar cruces de fechas:', error);
+      Swal.fire({
+        icon: 'warning',
+        title: 'No se pudo validar las fechas',
+        text: 'Ocurrió un error al consultar las reservas existentes. Intenta nuevamente.',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    // ─── 3. OBTENER DATOS DEL FORMULARIO ──────────────────
     const formValues = this.myForm.value;
     const ahora = new Date();
     const fechaFormateada = this.formatearFechaHora(ahora);
     const numeroTransaccion = `RES-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    // ─── 3. CONSTRUIR EL PAYLOAD COMPLETO ─────────────────
+    // ─── 4. CONSTRUIR EL PAYLOAD COMPLETO ─────────────────
     const payload = {
-      // ── Reserva ──
       ID_Cliente: this.clienteSelect.iD_Cliente,
       ID_Paquete: this.paqueteselect.iD_Paquete,
       Fecha_Reserva: fechaFormateada,
       Numero_Personas: parseInt(formValues.numero_Personas) || 1,
       Precio_Total: this.total_price,
       Observaciones: formValues.observaciones || '',
-
-      // ── Pago ──
-      Metodo_Pago: 'Efectivo',          // o el que corresponda
+      Metodo_Pago: 'Efectivo',
       Monto: this.pagar_con,
       Fecha_Pago: fechaFormateada,
       Numero_Transaccion: numeroTransaccion,
       Moneda: this.nombre_moneda || 'PEN',
       DestinoNombre: this.destino_nombreTipoMap.get(this.paqueteselect.iD_Destino) || '',
-
-      // ── Cliente (objeto completo) ──
       Cliente: {
         ID_Cliente: this.clienteSelect.iD_Cliente,
         Nombre: this.clienteSelect.nombre || '',
@@ -488,8 +602,6 @@ export class ReservasRegisterComponent implements OnInit {
         Pasaporte: this.clienteSelect.pasaporte || '',
         Nacionalidad: this.clienteSelect.nacionalidad || ''
       },
-
-      // ── Acompañantes (array de objetos) ──
       Acompanantes: this.acompanantes.map(a => ({
         ID_Cliente: a.iD_Cliente,
         Nombre: a.nombre || '',
@@ -499,8 +611,6 @@ export class ReservasRegisterComponent implements OnInit {
         Pasaporte: a.pasaporte || '',
         Nacionalidad: a.nacionalidad || ''
       })),
-
-      // ── Paquete (objeto completo) ──
       Paquete: {
         ID_Paquete: this.paqueteselect.iD_Paquete,
         Nombre: this.paqueteselect.nombre || '',
@@ -514,16 +624,13 @@ export class ReservasRegisterComponent implements OnInit {
       }
     };
 
-    // ─── 4. ENVIAR AL BACKEND (usando confirmarReserva) ──
+    // ─── 5. ENVIAR AL BACKEND ──────────────────────────────
     Swal.fire({ title: 'Procesando reserva...', allowOutsideClick: false, didOpen: () => Swal.showLoading(null) });
 
-    this._reservasService.confirmarReserva(payload).subscribe(
-      (response: any) => {
-        // ── 5. PROCESAR RESPUESTA ──────────────────────────
+    this._reservasService.confirmarReserva(payload).subscribe({
+      next: (response: any) => {
         Swal.close();
-
         if (response.success) {
-          // Guardar datos para el comprobante
           this.miReserva = {
             ...new ReservasModel(),
             iD_Reserva: response.id_Reserva,
@@ -541,7 +648,6 @@ export class ReservasRegisterComponent implements OnInit {
           this.pagarConComprobante = this.pagar_con;
           this.vueltoComprobante = this.vuelto;
 
-          // Mensaje de éxito
           Swal.fire({
             icon: 'success',
             title: 'Reserva realizada',
@@ -568,18 +674,16 @@ export class ReservasRegisterComponent implements OnInit {
             }
           });
 
-          // Limpiar formulario y abrir modal de comprobante
           this.limpiarTablas();
           setTimeout(() => {
             this.tituloModal = 'COMPROBANTE DE RESERVA';
             this.openModal(template);
           }, 2000);
-
         } else {
           throw new Error(response.mensaje || 'Error al crear reserva');
         }
       },
-      (error) => {
+      error: (error) => {
         Swal.close();
         console.error('Error en confirmarReserva:', error);
         let mensajeError = 'Ocurrió un error al procesar la reserva';
@@ -590,10 +694,6 @@ export class ReservasRegisterComponent implements OnInit {
         }
         Swal.fire({ icon: 'error', title: 'Error', text: mensajeError });
       }
-    );
-  }
-
-  listReserva(template: TemplateRef<any>) {
-    this.openModal(template);
+    });
   }
 }
