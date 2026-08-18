@@ -3,8 +3,10 @@ import { forkJoin } from 'rxjs';
 import { ReservasService } from 'src/app/service/reservas.service';
 import { PaqueteService } from 'src/app/service/paquete.service';
 import { DestinoService } from 'src/app/service/destino.service';
+import { ClientesService } from 'src/app/service/clientes.service';
 import { ReservasModel } from 'src/app/models/reservas.model';
 import { PaqueteModel } from 'src/app/models/paquete.model';
+import { ClienteModel } from 'src/app/models/clientes.model';
 import * as XLSX from 'xlsx-js-style';
 import * as FileSaver from 'file-saver';
 import Swal from 'sweetalert2';
@@ -16,6 +18,33 @@ const EXCEL_EXTENSION = '.xlsx';
 
 interface TopItem { nombre: string; cantidad: number; }
 interface ResumenEstado { estado: string; cantidad: number; }
+
+interface ClientePorPaquete {
+  paquete: string;
+  cliente: string;
+  pasaporte: string;
+  nacionalidad: string;
+  correo: string;
+  telefono: string;
+  totalPersonas: number;
+  acompanantes: number;
+  fechaSalida: string;
+  fechaFin: string;
+  estado: string;
+  fechaReserva: string;
+  precio: number;
+}
+
+interface ClientesPaqueteAgg { nombre: string; clientes: number; pasajeros: number; }
+
+interface ResumenSalida {
+  paquete: string;
+  fechaSalida: string;
+  fechaFin: string;
+  reservas: number;
+  pasajeros: number;
+  ingresos: number;
+}
 
 @Component({
   selector: 'app-welcome',
@@ -37,6 +66,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
   private paqueteNombreMap: { [id: number]: string } = {};
   private destinoNombreMap: Map<number, string> = new Map();
   private destinoMonedaMap: Map<number, string> = new Map();
+  private clienteMap: Map<number, ClienteModel> = new Map();
 
   // Filtros
   fechaInicio = '';
@@ -53,6 +83,11 @@ export class WelcomeComponent implements OnInit, OnDestroy {
   topDestinos: TopItem[] = [];
   resumenEstados: ResumenEstado[] = [];
 
+  // Reportes de clientes / pasajeros
+  clientesPorPaqueteDetalle: ClientePorPaquete[] = [];
+  clientesPorPaqueteResumen: ClientesPaqueteAgg[] = [];
+  resumenPorSalida: ResumenSalida[] = [];
+
   // Charts
   private charts: { [id: string]: any } = {};
   private readonly PALETTE = [
@@ -64,6 +99,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     private _reservasService: ReservasService,
     private _paqueteService: PaqueteService,
     private _destinoservice: DestinoService,
+    private _clientesService: ClientesService,
     private cdRef: ChangeDetectorRef
   ) { }
 
@@ -106,10 +142,11 @@ export class WelcomeComponent implements OnInit, OnDestroy {
 
   private cargarDatos(): void {
     forkJoin([
-      this._paqueteService.getAll(),
+      this._paqueteService.getAll(9999),
       this._reservasService.getAll(9999),
-      this._destinoservice.getAll()
-    ]).subscribe(([paquetes, reservas, destinos]) => {
+      this._destinoservice.getAll(9999),
+      this._clientesService.getAll(9999)
+    ]).subscribe(([paquetes, reservas, destinos, clientes]) => {
       paquetes.forEach(p => {
         this.paqueteMap.set(p.iD_Paquete, p);
         this.paqueteNombreMap[p.iD_Paquete] = p.nombre;
@@ -118,6 +155,7 @@ export class WelcomeComponent implements OnInit, OnDestroy {
         this.destinoNombreMap.set(d.iD_Destino, d.nombre);
         this.destinoMonedaMap.set(d.iD_Destino, d.moneda);
       });
+      clientes.forEach(c => this.clienteMap.set(c.iD_Cliente, c));
       reservas.forEach(r => {
         const paq = this.paqueteMap.get(r.iD_Paquete);
         if (paq) r.paquete = paq;
@@ -165,6 +203,22 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     return new Date(+m[3], +m[2] - 1, +m[1], h, mn);
   }
 
+  // fecha_Inicio/fecha_Fin del paquete puede venir como ISO ("2026-09-15") o
+  // con el mismo formato con hora que usas en reservas; probamos ambos.
+  private parseFechaGenerica(s: string): Date | null {
+    if (!s) return null;
+    const conHora = this.parseFecha(s);
+    if (conHora) return conHora;
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  formatearFecha(s: string): string {
+    const d = this.parseFechaGenerica(s);
+    if (!d) return s || '—';
+    return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  }
+
   private toYMD(d: Date): string {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
@@ -194,6 +248,9 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     this.renderEstados(datos);
     this.renderPersonas(datos);
     this.renderTendencia(datos);
+    this.calcularReportesClientes(datos);
+    this.renderClientesPorPaquete();
+    this.renderPasajerosPorSalida();
     this.cdRef.detectChanges();
   }
 
@@ -223,6 +280,71 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     datos.forEach(r => estadosMap.set(r.estatus, (estadosMap.get(r.estatus) || 0) + 1));
     this.resumenEstados = [...estadosMap.entries()]
       .map(([estado, cantidad]) => ({ estado, cantidad }));
+  }
+
+  private calcularReportesClientes(datos: ReservasModel[]): void {
+    // Detalle: 1 fila por reserva (titular + cantidad de acompañantes)
+    this.clientesPorPaqueteDetalle = datos.map(r => {
+      const cliente = this.clienteMap.get(r.iD_Cliente);
+      const paq = this.paqueteMap.get(r.iD_Paquete);
+      return {
+        paquete: paq?.nombre || this.paqueteNombreMap[r.iD_Paquete] || 'Desconocido',
+        cliente: cliente ? `${cliente.nombre} ${cliente.apellido}`.trim() : 'Desconocido',
+        pasaporte: cliente?.pasaporte || '',
+        nacionalidad: cliente?.nacionalidad || '',
+        correo: cliente?.correo || '',
+        telefono: cliente?.telefono || '',
+        totalPersonas: r.numero_Personas || 0,
+        acompanantes: Math.max((r.numero_Personas || 0) - 1, 0),
+        fechaSalida: paq?.fecha_Inicio || '',
+        fechaFin: paq?.fecha_Fin || '',
+        estado: r.estatus,
+        fechaReserva: r.fecha_Reserva,
+        precio: r.precio_Total || 0
+      } as ClientePorPaquete;
+    });
+
+    // Resumen agregado por paquete (para el gráfico de barras)
+    const mapPaqAgg = new Map<string, { clientes: number; pasajeros: number }>();
+    datos.forEach(r => {
+      const nombre = this.paqueteNombreMap[r.iD_Paquete] || 'Desconocido';
+      const cur = mapPaqAgg.get(nombre) || { clientes: 0, pasajeros: 0 };
+      cur.clientes++;
+      cur.pasajeros += r.numero_Personas || 0;
+      mapPaqAgg.set(nombre, cur);
+    });
+    this.clientesPorPaqueteResumen = [...mapPaqAgg.entries()]
+      .map(([nombre, v]) => ({ nombre, clientes: v.clientes, pasajeros: v.pasajeros }))
+      .sort((a, b) => b.pasajeros - a.pasajeros);
+
+    // Resumen por salida (paquete + fecha_Inicio del paquete)
+    const mapSalida = new Map<string, ResumenSalida>();
+    datos.forEach(r => {
+      const paq = this.paqueteMap.get(r.iD_Paquete);
+      const nombre = paq?.nombre || this.paqueteNombreMap[r.iD_Paquete] || 'Desconocido';
+      const fechaSalida = paq?.fecha_Inicio || '';
+      const key = `${nombre}|${fechaSalida}`;
+      const cur = mapSalida.get(key) || {
+        paquete: nombre,
+        fechaSalida,
+        fechaFin: paq?.fecha_Fin || '',
+        reservas: 0,
+        pasajeros: 0,
+        ingresos: 0
+      };
+      cur.reservas++;
+      cur.pasajeros += r.numero_Personas || 0;
+      cur.ingresos += r.precio_Total || 0;
+      mapSalida.set(key, cur);
+    });
+    this.resumenPorSalida = [...mapSalida.values()].sort((a, b) => {
+      const da = this.parseFechaGenerica(a.fechaSalida);
+      const db = this.parseFechaGenerica(b.fechaSalida);
+      if (!da && !db) return 0;
+      if (!da) return 1;
+      if (!db) return -1;
+      return da.getTime() - db.getTime();
+    });
   }
 
   private renderTopPaquetes(datos: ReservasModel[]): void {
@@ -408,7 +530,6 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     });
   }
 
-
   private renderTendencia(datos: ReservasModel[]): void {
     const map = new Map<string, number>();
     datos.forEach(r => {
@@ -483,6 +604,83 @@ export class WelcomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  private renderClientesPorPaquete(): void {
+    const top = this.clientesPorPaqueteResumen.slice(0, 8);
+    this.renderChart('chartClientesPaquete', {
+      type: 'bar',
+      data: {
+        labels: top.map(t => t.nombre),
+        datasets: [
+          {
+            label: 'Clientes (reservas)',
+            data: top.map(t => t.clientes),
+            backgroundColor: '#3B82F6',
+            borderRadius: 8,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7
+          },
+          {
+            label: 'Pasajeros totales',
+            data: top.map(t => t.pasajeros),
+            backgroundColor: '#F97316',
+            borderRadius: 8,
+            barPercentage: 0.6,
+            categoryPercentage: 0.7
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#1e293b', font: { size: 11 } } },
+          tooltip: {
+            backgroundColor: '#ffffff', titleColor: '#0f172a', bodyColor: '#334155',
+            borderColor: '#e2e8f0', borderWidth: 1
+          }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { color: '#475569', stepSize: 1 }, grid: { color: '#e2e8f0', drawBorder: false } },
+          x: { ticks: { color: '#1e293b', font: { size: 10 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  private renderPasajerosPorSalida(): void {
+    const top = this.resumenPorSalida.slice(0, 12);
+    this.renderChart('chartPasajerosSalida', {
+      type: 'bar',
+      data: {
+        labels: top.map(t => `${t.paquete} — ${this.formatearFecha(t.fechaSalida)}`),
+        datasets: [{
+          label: 'Pasajeros',
+          data: top.map(t => t.pasajeros),
+          backgroundColor: '#14B8A6',
+          borderRadius: 8,
+          barPercentage: 0.6,
+          categoryPercentage: 0.7
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#ffffff', titleColor: '#0f172a', bodyColor: '#334155',
+            borderColor: '#e2e8f0', borderWidth: 1
+          }
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { color: '#475569', stepSize: 1 }, grid: { color: '#e2e8f0', drawBorder: false } },
+          y: { ticks: { color: '#1e293b', font: { size: 10 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
   private renderChart(canvasId: string, config: any): void {
     const el = document.getElementById(canvasId) as HTMLCanvasElement;
     if (!el) return;
@@ -547,6 +745,70 @@ export class WelcomeComponent implements OnInit, OnDestroy {
       'Cantidad': e.cantidad
     }));
     XLSX.utils.book_append_sheet(wb, this.createStyledSheet(rowsEst, ['#', 'Estado', 'Cantidad']), 'Reservas por Estado');
+
+    // Hoja: Clientes por Paquete (detalle)
+    const rowsClientes = this.clientesPorPaqueteDetalle.map((c, i) => ({
+      '#': i + 1,
+      'Paquete': c.paquete,
+      'Cliente (Titular)': c.cliente,
+      'Pasaporte': c.pasaporte,
+      'Nacionalidad': c.nacionalidad,
+      'Correo': c.correo,
+      'Teléfono': c.telefono,
+      'N° Pasajeros': c.totalPersonas,
+      'Acompañantes': c.acompanantes,
+      'Fecha Salida': this.formatearFecha(c.fechaSalida),
+      'Fecha Fin': this.formatearFecha(c.fechaFin),
+      'Estado': c.estado,
+      'Precio (S/)': c.precio.toFixed(2)
+    }));
+    XLSX.utils.book_append_sheet(wb, this.createStyledSheet(rowsClientes,
+      ['#', 'Paquete', 'Cliente (Titular)', 'Pasaporte', 'Nacionalidad', 'Correo', 'Teléfono',
+        'N° Pasajeros', 'Acompañantes', 'Fecha Salida', 'Fecha Fin', 'Estado', 'Precio (S/)']
+    ), 'Clientes por Paquete');
+
+    // Hoja: Resumen por Salida
+    const rowsSalida = this.resumenPorSalida.map((s, i) => ({
+      '#': i + 1,
+      'Paquete': s.paquete,
+      'Fecha Salida': this.formatearFecha(s.fechaSalida),
+      'Fecha Fin': this.formatearFecha(s.fechaFin),
+      'N° Reservas': s.reservas,
+      'N° Pasajeros': s.pasajeros,
+      'Ingresos (S/)': s.ingresos.toFixed(2)
+    }));
+    XLSX.utils.book_append_sheet(wb, this.createStyledSheet(rowsSalida,
+      ['#', 'Paquete', 'Fecha Salida', 'Fecha Fin', 'N° Reservas', 'N° Pasajeros', 'Ingresos (S/)']
+    ), 'Resumen por Salida');
+
+    // Hoja: Manifiesto de Pasajeros (titular + filas en blanco para acompañantes)
+    const rowsManifiesto: any[] = [];
+    let contador = 1;
+    this.clientesPorPaqueteDetalle.forEach(c => {
+      rowsManifiesto.push({
+        '#': contador++,
+        'Paquete': c.paquete,
+        'Fecha Salida': this.formatearFecha(c.fechaSalida),
+        'Tipo': 'Titular',
+        'Nombre Completo': c.cliente,
+        'Pasaporte': c.pasaporte,
+        'Nacionalidad': c.nacionalidad
+      });
+      for (let i = 0; i < c.acompanantes; i++) {
+        rowsManifiesto.push({
+          '#': contador++,
+          'Paquete': c.paquete,
+          'Fecha Salida': this.formatearFecha(c.fechaSalida),
+          'Tipo': `Acompañante ${i + 1}`,
+          'Nombre Completo': '',
+          'Pasaporte': '',
+          'Nacionalidad': ''
+        });
+      }
+    });
+    XLSX.utils.book_append_sheet(wb, this.createStyledSheet(rowsManifiesto,
+      ['#', 'Paquete', 'Fecha Salida', 'Tipo', 'Nombre Completo', 'Pasaporte', 'Nacionalidad']
+    ), 'Manifiesto Pasajeros');
 
     const buffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([buffer], { type: EXCEL_TYPE });

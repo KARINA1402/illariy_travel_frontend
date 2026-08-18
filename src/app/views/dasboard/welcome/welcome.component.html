@@ -132,3 +132,69 @@
     </div>
   </div>
 </div>
+
+<!-- Clientes/Pasajeros por Paquete y por Salida -->
+<div class="container-fluid px-4 mt-4">
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="chart-glass">
+        <div class="chart-glass-header">
+          <i class="fas fa-user-friends me-2"></i> Clientes y Pasajeros por Paquete
+        </div>
+        <div class="chart-glass-body">
+          <canvas id="chartClientesPaquete"></canvas>
+          <div class="no-data" *ngIf="clientesPorPaqueteResumen.length === 0">Sin datos</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="chart-glass">
+        <div class="chart-glass-header">
+          <i class="fas fa-plane-departure me-2"></i> Pasajeros por Salida
+        </div>
+        <div class="chart-glass-body">
+          <canvas id="chartPasajerosSalida"></canvas>
+          <div class="no-data" *ngIf="resumenPorSalida.length === 0">Sin datos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detalle de clientes por paquete -->
+<div class="container-fluid px-4 mt-4 mb-4">
+  <div class="chart-glass">
+    <div class="chart-glass-header">
+      <i class="fas fa-list me-2"></i> Detalle de Clientes por Paquete
+    </div>
+    <div class="table-responsive" style="max-height: 400px;">
+      <table class="table table-sm table-hover align-middle mb-0">
+        <thead class="table-light" style="position: sticky; top: 0;">
+          <tr>
+            <th>Paquete</th>
+            <th>Cliente (Titular)</th>
+            <th>Pasaporte</th>
+            <th class="text-center">Pasajeros</th>
+            <th class="text-center">Acompañantes</th>
+            <th>Fecha Salida</th>
+            <th>Estado</th>
+            <th class="text-end">Precio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of clientesPorPaqueteDetalle">
+            <td>{{ c.paquete }}</td>
+            <td>{{ c.cliente }}</td>
+            <td>{{ c.pasaporte || '—' }}</td>
+            <td class="text-center">{{ c.totalPersonas }}</td>
+            <td class="text-center">{{ c.acompanantes }}</td>
+            <td>{{ formatearFecha(c.fechaSalida) }}</td>
+            <td>{{ c.estado }}</td>
+            <td class="text-end">S/ {{ c.precio | number:'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="no-data p-3 text-center" *ngIf="clientesPorPaqueteDetalle.length === 0">Sin datos</div>
+    </div>
+  </div>
+</div>
