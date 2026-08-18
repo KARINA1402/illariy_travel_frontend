@@ -390,6 +390,10 @@ export class ReservasRegisterComponent implements OnInit {
     }));
   }
 
+  listReserva(template: TemplateRef<any>) {
+    this.openModal(template);
+  }
+
   closeModal(res: boolean) {
     this.closeModalEmmit.emit(res);
   }
