@@ -26,6 +26,11 @@ export class ReservasService {
     return this._http.post<ReservasModel>(this.url, reservas);
   }
 
+  confirmarReserva(reservaData: any): Observable<any> {
+    const endpoint = `${this.url}confirmar`;
+    return this._http.post(endpoint, reservaData);
+  }
+
   update(reservas: ReservasModel): Observable<ReservasModel> {
     return this._http.put<ReservasModel>(this.url, reservas)
   }

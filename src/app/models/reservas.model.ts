@@ -18,6 +18,7 @@ export class ReservasModel {
 
     //Datos paquete
     paquete?: PaqueteModel;
+    numero_Transaccion?: string;
 
     // status: StatusModel;
     constructor() {
